@@ -91,7 +91,13 @@ function renderSlide() {
         prevBtn.style.display = 'none';
         pageInd.style.display = 'none';
     } else {
-        contentDiv.innerHTML = data.html;
+        let contentHtml = data.html;
+        // Render sprite image for slides 0-5
+        if (state.currentSlide <= 5) {
+            contentHtml = `<div class="slide-sprite slide-sprite-${state.currentSlide}"></div>` + contentHtml;
+        }
+        contentDiv.innerHTML = contentHtml;
+
         // Restore name if back on slide 0
         if (state.currentSlide === 0 && state.userName) {
             const input = document.getElementById('inputName');
