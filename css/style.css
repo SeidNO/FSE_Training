@@ -1,0 +1,383 @@
+:root {
+    /* Seid Brand Colors (Approximate based on web profile) */
+    --primary: #005596;
+    /* Seid Corporate Blue */
+    --primary-dark: #003366;
+    --accent: #78be20;
+    /* Seid "Green Tour" Green */
+    --text: #333333;
+    --text-light: #666666;
+    --bg: #f8f9fa;
+    /* Clean light grey background */
+    --white: #ffffff;
+    --success: #78be20;
+    --danger: #d9534f;
+    --radius: 4px;
+    /* Slightly sharper corners for industrial look */
+}
+
+body {
+    font-family: 'Open Sans', 'Segoe UI', Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* --- Top Bar --- */
+.top-bar {
+    background-color: var(--white);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid var(--accent);
+    /* Green line under header */
+}
+
+.logo {
+    font-weight: 800;
+    font-size: 1.8rem;
+    color: var(--primary-dark);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.logo span {
+    color: var(--accent);
+}
+
+.lang-switch button {
+    background: none;
+    border: 1px solid #ddd;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+.lang-switch button:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.lang-switch button.active {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* --- Main Canvas --- */
+.course-canvas {
+    flex: 1;
+    max-width: 960px;
+    width: 100%;
+    margin: 40px auto;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* --- Progress Bar --- */
+.progress-container {
+    height: 6px;
+    background-color: #eee;
+    width: 100%;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: var(--accent);
+    /* Green progress bar */
+    width: 0%;
+    transition: width 0.4s ease;
+}
+
+/* --- Content Area --- */
+.content-area {
+    padding: 50px 60px;
+    flex: 1;
+    overflow-y: auto;
+    line-height: 1.8;
+}
+
+h1 {
+    color: var(--primary-dark);
+    margin-bottom: 15px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+h2 {
+    color: var(--primary);
+    margin-top: 35px;
+    font-size: 1.5rem;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+    font-weight: 600;
+}
+
+h3 {
+    color: var(--text);
+    margin-top: 30px;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+p {
+    margin-bottom: 18px;
+    font-size: 1.05rem;
+    color: #444;
+}
+
+/* Information Boxes */
+.highlight-box {
+    background-color: #f0f7fd;
+    /* Very light blue */
+    border-left: 4px solid var(--primary);
+    padding: 20px 25px;
+    margin: 25px 0;
+    border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.warning-box {
+    background-color: #fff9e6;
+    border-left: 4px solid #ffc107;
+    padding: 20px 25px;
+    margin: 25px 0;
+}
+
+.danger-box {
+    background-color: #fff5f5;
+    border-left: 4px solid var(--danger);
+    color: #a94442;
+    padding: 20px 25px;
+    margin: 25px 0;
+}
+
+ul,
+ol {
+    margin-bottom: 25px;
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 8px;
+    padding-left: 5px;
+}
+
+/* Bullet points color */
+ul li::marker {
+    color: var(--accent);
+}
+
+/* --- Navigation Footer --- */
+.nav-footer {
+    padding: 25px 60px;
+    background-color: #f9f9f9;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn {
+    padding: 12px 30px;
+    border-radius: 2px;
+    /* Square buttons */
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 2px 5px rgba(0, 85, 150, 0.3);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background-color: #fff;
+    color: #666;
+    border: 1px solid #ddd;
+}
+
+.btn-secondary:hover {
+    background-color: #f0f0f0;
+    border-color: #ccc;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* --- Quiz Styles --- */
+.quiz-question {
+    margin-bottom: 35px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 25px;
+}
+
+.quiz-option {
+    display: block;
+    margin: 12px 0;
+    padding: 15px;
+    border: 2px solid #eee;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.quiz-option:hover {
+    background-color: #f9fff9;
+    border-color: var(--accent);
+}
+
+input[type="radio"] {
+    margin-right: 12px;
+    transform: scale(1.3);
+    accent-color: var(--accent);
+}
+
+/* --- Certificate --- */
+#certificate-view {
+    display: block;
+    /* Default block, logic handles showing/hiding content */
+    text-align: center;
+    padding: 60px;
+    border: 10px solid var(--primary-dark);
+    margin: 20px;
+    background: white;
+    position: relative;
+}
+
+.cert-logo {
+    font-size: 2.5rem;
+    color: var(--primary-dark);
+    margin-bottom: 40px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.cert-logo span {
+    color: var(--accent);
+}
+
+.cert-title {
+    font-size: 3.5rem;
+    color: var(--accent);
+    margin-bottom: 10px;
+    font-family: 'Open Sans', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-weight: 300;
+}
+
+.cert-name {
+    font-size: 2.8rem;
+    border-bottom: 2px solid #333;
+    display: inline-block;
+    min-width: 450px;
+    margin: 30px 0;
+    font-weight: 600;
+}
+
+.cert-details {
+    margin-top: 50px;
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.6;
+}
+
+/* --- Inputs --- */
+input.name-input {
+    padding: 15px;
+    font-size: 1.1rem;
+    width: 100%;
+    max-width: 400px;
+    border: 2px solid #ddd;
+    border-radius: var(--radius);
+    margin-top: 20px;
+    outline: none;
+    font-family: 'Open Sans', sans-serif;
+    transition: border-color 0.2s;
+}
+
+input.name-input:focus {
+    border-color: var(--accent);
+}
+
+/* --- Print Styles (Completely Revised for Reliability) --- */
+@media print {
+
+    /* 1. Reset Page and Hide UI Chrome */
+    body {
+        background: white;
+        color: black;
+        margin: 0;
+        padding: 0;
+    }
+
+    .top-bar,
+    .nav-footer,
+    .progress-container,
+    .btn,
+    .no-print {
+        display: none !important;
+    }
+
+    /* 2. Style the Container to allow full page print */
+    .course-canvas {
+        box-shadow: none !important;
+        border: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        position: static !important;
+        /* Let it flow normally */
+        overflow: visible !important;
+    }
+
+    .content-area {
+        padding: 0 !important;
+        overflow: visible !important;
+        margin: 0 !important;
+    }
+
+    /* 3. Ensure Certificate looks good */
+    #certificate-view {
+        display: block !important;
+        border: 5px solid var(--primary-dark) !important;
+        margin: 0 auto !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        page-break-inside: avoid;
+        /* Try to keep it on one page */
+    }
+}
