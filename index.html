@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Prevents search engines from indexing this page -->
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="googlebot" content="noindex">
+    
     <title>Seid AS - FSE & Safety Training</title>
     <!-- Import Open Sans to match professional industrial profile -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -247,7 +251,7 @@
 
         /* --- Certificate --- */
         #certificate-view {
-            display: block; /* Changed from none to block so it shows on screen */
+            display: block; /* Default block, logic handles showing/hiding content */
             text-align: center;
             padding: 60px;
             border: 10px solid var(--primary-dark);
@@ -300,23 +304,50 @@
         }
         input.name-input:focus { border-color: var(--accent); }
 
-        /* --- Print Styles --- */
+        /* --- Print Styles (Completely Revised for Reliability) --- */
         @media print {
-            body { background: white; visibility: hidden; }
-            .top-bar, .nav-footer, .progress-container { display: none !important; }
-            .course-canvas { box-shadow: none; border: none; margin: 0; width: 100%; max-width: 100%; position: absolute; top: 0; left: 0; visibility: visible; }
-            #contentArea { overflow: visible; padding: 0; }
+            /* 1. Reset Page and Hide UI Chrome */
+            body { 
+                background: white; 
+                color: black; 
+                margin: 0; 
+                padding: 0;
+            }
+            .top-bar, 
+            .nav-footer, 
+            .progress-container,
+            .btn,
+            .no-print { 
+                display: none !important; 
+            }
+
+            /* 2. Style the Container to allow full page print */
+            .course-canvas { 
+                box-shadow: none !important; 
+                border: none !important; 
+                margin: 0 !important; 
+                padding: 0 !important;
+                width: 100% !important; 
+                max-width: 100% !important; 
+                position: static !important; /* Let it flow normally */
+                overflow: visible !important;
+            }
+
+            .content-area { 
+                padding: 0 !important; 
+                overflow: visible !important;
+                margin: 0 !important;
+            }
+
+            /* 3. Ensure Certificate looks good */
             #certificate-view { 
                 display: block !important; 
-                border: 10px solid var(--primary-dark); 
-                page-break-inside: avoid;
-                width: 100%;
-                box-sizing: border-box;
-                position: absolute;
-                top: 0;
-                left: 0;
+                border: 5px solid var(--primary-dark) !important; 
+                margin: 0 auto !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+                page-break-inside: avoid; /* Try to keep it on one page */
             }
-            .no-print { display: none; }
         }
     </style>
 </head>
