@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seid AS - FSE & Safety Training</title>
+    <!-- Import Open Sans to match professional industrial profile -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Seid Brand Colors (Approximate based on web profile) */
+            --primary: #005596; /* Seid Corporate Blue */
+            --primary-dark: #003366;
+            --accent: #78be20; /* Seid "Green Tour" Green */
+            --text: #333333;
+            --text-light: #666666;
+            --bg: #f8f9fa; /* Clean light grey background */
+            --white: #ffffff;
+            --success: #78be20;
+            --danger: #d9534f;
+            --radius: 4px; /* Slightly sharper corners for industrial look */
+        }
+
+        body {
+            font-family: 'Open Sans', 'Segoe UI', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- Top Bar --- */
+        .top-bar {
+            background-color: var(--white);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--accent); /* Green line under header */
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.8rem;
+            color: var(--primary-dark);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-family: 'Open Sans', sans-serif;
+        }
+        
+        .logo span {
+            color: var(--accent);
+        }
+
+        .lang-switch button {
+            background: none;
+            border: 1px solid #ddd;
+            padding: 6px 12px;
+            cursor: pointer;
+            border-radius: var(--radius);
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .lang-switch button:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .lang-switch button.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* --- Main Canvas --- */
+        .course-canvas {
+            flex: 1;
+            max-width: 960px;
+            width: 100%;
+            margin: 40px auto;
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* --- Progress Bar --- */
+        .progress-container {
+            height: 6px;
+            background-color: #eee;
+            width: 100%;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: var(--accent); /* Green progress bar */
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        /* --- Content Area --- */
+        .content-area {
+            padding: 50px 60px;
+            flex: 1;
+            overflow-y: auto;
+            line-height: 1.8;
+        }
+
+        h1 { 
+            color: var(--primary-dark); 
+            margin-bottom: 15px; 
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        h2 { 
+            color: var(--primary); 
+            margin-top: 35px; 
+            font-size: 1.5rem; 
+            border-bottom: 2px solid #f0f0f0; 
+            padding-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        h3 { 
+            color: var(--text); 
+            margin-top: 30px; 
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        
+        p { margin-bottom: 18px; font-size: 1.05rem; color: #444; }
+        
+        /* Information Boxes */
+        .highlight-box {
+            background-color: #f0f7fd; /* Very light blue */
+            border-left: 4px solid var(--primary);
+            padding: 20px 25px;
+            margin: 25px 0;
+            border-radius: 0 var(--radius) var(--radius) 0;
+        }
+
+        .warning-box {
+            background-color: #fff9e6;
+            border-left: 4px solid #ffc107;
+            padding: 20px 25px;
+            margin: 25px 0;
+        }
+
+        .danger-box {
+            background-color: #fff5f5;
+            border-left: 4px solid var(--danger);
+            color: #a94442;
+            padding: 20px 25px;
+            margin: 25px 0;
+        }
+
+        ul, ol { margin-bottom: 25px; padding-left: 20px; }
+        li { margin-bottom: 8px; padding-left: 5px; }
+        
+        /* Bullet points color */
+        ul li::marker { color: var(--accent); }
+
+        /* --- Navigation Footer --- */
+        .nav-footer {
+            padding: 25px 60px;
+            background-color: #f9f9f9;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: 2px; /* Square buttons */
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .btn-primary { 
+            background-color: var(--primary); 
+            color: white; 
+            box-shadow: 0 2px 5px rgba(0,85,150,0.3);
+        }
+        
+        .btn-primary:hover { 
+            background-color: var(--primary-dark); 
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary { 
+            background-color: #fff; 
+            color: #666; 
+            border: 1px solid #ddd;
+        }
+        
+        .btn-secondary:hover { 
+            background-color: #f0f0f0; 
+            border-color: #ccc;
+        }
+        
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* --- Quiz Styles --- */
+        .quiz-question { margin-bottom: 35px; border-bottom: 1px solid #eee; padding-bottom: 25px; }
+        
+        .quiz-option { 
+            display: block; 
+            margin: 12px 0; 
+            padding: 15px; 
+            border: 2px solid #eee; 
+            border-radius: var(--radius); 
+            cursor: pointer; 
+            transition: all 0.2s;
+        }
+        
+        .quiz-option:hover { 
+            background-color: #f9fff9; 
+            border-color: var(--accent); 
+        }
+        
+        input[type="radio"] { 
+            margin-right: 12px; 
+            transform: scale(1.3); 
+            accent-color: var(--accent);
+        }
+
+        /* --- Certificate --- */
+        #certificate-view {
+            display: block; /* Changed from none to block so it shows on screen */
+            text-align: center;
+            padding: 60px;
+            border: 10px solid var(--primary-dark);
+            margin: 20px;
+            background: white;
+            position: relative;
+        }
+        .cert-logo { 
+            font-size: 2.5rem; 
+            color: var(--primary-dark); 
+            margin-bottom: 40px; 
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+        .cert-logo span { color: var(--accent); }
+        
+        .cert-title { 
+            font-size: 3.5rem; 
+            color: var(--accent); 
+            margin-bottom: 10px; 
+            font-family: 'Open Sans', sans-serif; 
+            text-transform: uppercase; 
+            letter-spacing: 3px;
+            font-weight: 300;
+        }
+        
+        .cert-name { 
+            font-size: 2.8rem; 
+            border-bottom: 2px solid #333; 
+            display: inline-block; 
+            min-width: 450px; 
+            margin: 30px 0; 
+            font-weight: 600; 
+        }
+        
+        .cert-details { margin-top: 50px; font-size: 0.95rem; color: #555; line-height: 1.6;}
+        
+        /* --- Inputs --- */
+        input.name-input {
+            padding: 15px;
+            font-size: 1.1rem;
+            width: 100%;
+            max-width: 400px;
+            border: 2px solid #ddd;
+            border-radius: var(--radius);
+            margin-top: 20px;
+            outline: none;
+            font-family: 'Open Sans', sans-serif;
+            transition: border-color 0.2s;
+        }
+        input.name-input:focus { border-color: var(--accent); }
+
+        /* --- Print Styles --- */
+        @media print {
+            body { background: white; visibility: hidden; }
+            .top-bar, .nav-footer, .progress-container { display: none !important; }
+            .course-canvas { box-shadow: none; border: none; margin: 0; width: 100%; max-width: 100%; position: absolute; top: 0; left: 0; visibility: visible; }
+            #contentArea { overflow: visible; padding: 0; }
+            #certificate-view { 
+                display: block !important; 
+                border: 10px solid var(--primary-dark); 
+                page-break-inside: avoid;
+                width: 100%;
+                box-sizing: border-box;
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="logo">SEID<span>.</span></div>
+        <div class="lang-switch">
+            <button id="btn-no" class="active" onclick="setLang('no')">Norsk</button>
+            <button id="btn-en" onclick="setLang('en')">English</button>
+        </div>
+    </div>
+
+    <div class="course-canvas">
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="content-area" id="contentArea">
+            <!-- Content Injected Here -->
+        </div>
+
+        <div class="nav-footer">
+            <button class="btn btn-secondary" id="prevBtn" onclick="changeSlide(-1)">Forrige</button>
+            <span id="pageIndicator" style="color: #888; font-size: 0.9rem; font-weight: 600;">1 / 8</span>
+            <button class="btn btn-primary" id="nextBtn" onclick="changeSlide(1)">Neste</button>
+        </div>
+    </div>
+
+<script>
+    // --- State Management ---
+    let currentSlide = 0;
+    let currentLang = 'no';
+    let userName = "";
+    
+    // Warn user before leaving if not finished
+    window.onbeforeunload = function() {
+        if (currentSlide > 0 && currentSlide < content[currentLang].length - 1) {
+            return "Du er ikke ferdig med kurset. Fremgang vil gå tapt.";
+        }
+    };
+
+    // --- Content Database ---
+    const content = {
+        no: [
+            {
+                title: "Velkommen til FSE & Sikkerhetskurs",
+                html: `
+                    <h1>Årlig FSE-Oppdatering</h1>
+                    <p>Dette kurset er obligatorisk for alle som arbeider på eller nær ved elektriske anlegg i <strong>Seid AS</strong>. Kurset dekker myndighetskravene i <em>Forskrift om sikkerhet ved arbeid i og drift av elektriske anlegg (FSE)</em>.</p>
+                    
+                    <div class="highlight-box">
+                        <strong>Fokusområder for Seid AS:</strong>
+                        <ul style="margin-bottom:0; margin-top: 10px;">
+                            <li>Internasjonale oppdrag og fremmede nettsystemer.</li>
+                            <li>SMPS høyspent strømforsyninger (400V 3-fase input).</li>
+                            <li>Farene ved DC-link og kondensatorer (Lagret energi).</li>
+                        </ul>
+                    </div>
+
+                    <p><strong>Merk:</strong> Dette kurset dekker teoridelen. Praktisk øvelse i hjerte-lungeredning (HLR) og gjennomgang av førstehjelpsutstyr må gjennomføres separat for full godkjenning.</p>
+                    
+                    <p>Vennligst skriv inn ditt fulle navn slik det skal stå på kursbeviset:</p>
+                    <input type="text" id="inputName" class="name-input" placeholder="Ditt fulle navn" oninput="updateName(this.value)">
+                `
+            },
+            {
+                title: "Modul 1: Ansvar og Roller",
+                html: `
+                    <h2>Hvem bestemmer på anlegget?</h2>
+                    <p>FSE § 6 og § 7 definerer tydelige roller for å ivareta sikkerheten. Når vi reiser ut til kunder i Europa, Asia eller USA, møter vi ofte komplekse ansvarsforhold.</p>
+                    
+                    <h3>Anleggseier vs. Seid AS</h3>
+                    <p>Grensesnittet er kritisk. Vi leverer utstyret, men <strong>lokal installatør/elektriker</strong> kobler ofte nettet (grid) til våre klemmer.</p>
+                    <ul>
+                        <li><strong>Leder for sikkerhet (LFS):</strong> Skal alltid være utpekt for arbeidet. Hvis ingen andre er utpekt, er DU ansvarlig for din egen sikkerhet.</li>
+                        <li><strong>Ditt ansvar:</strong> Sikkerheten på selve SMPS-enheten, DC-link og tilkoblet last.</li>
+                        <li><strong>Grensesnitt:</strong> Inntaksklemmer. Anta alltid at tilførselskabelen er spenningssatt inntil du selv har målt.</li>
+                    </ul>
+                    <div class="warning-box">
+                        <strong>Scenario:</strong> Elektrikeren sier "Power is Off". <br>
+                        <strong>Handling:</strong> Stol aldri på muntlige beskjeder. Verifiser alltid selv med spenningsprøver før du berører noe. FSE krever at du forsikrer deg om at anlegget er spenningsløst.
+                    </div>
+                `
+            },
+            {
+                title: "Modul 2: Planlegging og SJA",
+                html: `
+                    <h2>Sikker Jobb Analyse (SJA)</h2>
+                    <p>FSE § 10 krever planlegging av alt arbeid. Ulykker skjer ofte ved "rutinearbeid" der vi hopper over planleggingen.</p>
+                    
+                    <h3>Spesifikk risiko for Seid-utstyr</h3>
+                    <p>Når vi jobber med Switch Mode Power Supplies, har vi farer som en vanlig husinstallatør ikke møter:</p>
+                    <ul>
+                        <li><strong>Høy Energitetthet:</strong> 400V/480V 3-fase har enorm kortslutningsytelse. Lysbuer her er eksplosive.</li>
+                        <li><strong>Lagret Energi (Kondensatorer):</strong> Dette er vår største interne fare. Selv om sikringen er ute (LOTO), kan DC-linken inneholde dødelig spenning i flere minutter.</li>
+                        <li><strong>HF-støy/Lekkasjestrøm:</strong> Kan lure vanlige multimetere. Bruk egnet måleutstyr.</li>
+                    </ul>
+                    
+                    <div class="highlight-box">
+                        <strong>SJA i praksis:</strong> Stopp opp i 2 minutter før du åpner skapet. Er det vått? Er det trangt? Har jeg riktig verneutstyr? Hvis uhellet er ute, hvordan kommer jeg meg vekk?
+                    </div>
+                `
+            },
+            {
+                title: "Modul 3: Lysbue og Strømgjennomgang",
+                html: `
+                    <h2>Skademekanismer</h2>
+                    
+                    <h3>1. Strømgjennomgang (Sjokk)</h3>
+                    <p>Ved 400V AC risikerer vi krampe (tetanus) hvor du ikke klarer å slippe lederen. Strømmen går gjennom kroppen og kan skade:</p>
+                    <ul>
+                        <li>Nervesystemet (umiddelbart eller senskader).</li>
+                        <li>Hjertet (Rytmeforstyrrelser/Flimmer).</li>
+                        <li>Indre organer (Brannskader innvendig).</li>
+                    </ul>
+
+                    <h3>2. Lysbue (Arc Flash)</h3>
+                    <p>En kortslutning på inntaket til våre skap kan skape temperaturer opp mot 20 000 °C. Konsekvenser:</p>
+                    <ul>
+                        <li>Trykkbølge (kan kaste deg bakover).</li>
+                        <li>Smeltet metall (kobber fordamper og ekspanderer 67 000 ganger).</li>
+                        <li>Blindhet (intens UV-stråling) og alvorlige brannskader.</li>
+                    </ul>
+                    <div class="danger-box">
+                        <strong>Krav til verneutstyr (PPE):</strong> Bruk <strong>alltid</strong> visir og flammehemmende bekledning ved spenningsprøving, betjening av effektbrytere eller arbeid nær spenningssatte deler. Bomull innerst, aldri syntetisk som smelter mot huden.
+                    </div>
+                `
+            },
+            {
+                title: "Modul 4: Arbeidsmetoder",
+                html: `
+                    <h2>De 3 Arbeidsmetodene (FSE § 14-16)</h2>
+                    <ol>
+                        <li><strong>Arbeid på frakoblet anlegg</strong> (Standard for oss).</li>
+                        <li><strong>Arbeid nær ved spenningssatte deler</strong> (Ofte under testing).</li>
+                        <li><strong>Arbeid under spenning - AUS</strong> (Kun for spesifikk feilsøking i styreskap < 50V eller med spesialopplæring).</li>
+                    </ol>
+
+                    <h3>De 5 Sikkerhetsreglene (Ved frakoblet arbeid)</h3>
+                    <p>Disse må følges slavisk i rekkefølge:</p>
+                    <ol>
+                        <li><strong>Frakoble:</strong> Åpne bryter/sikring. Sørg for synlig brudd om mulig.</li>
+                        <li><strong>Sikre mot innkobling:</strong> Bruk hengelås (LOTO) og skilt "Må ikke betjenes". Ta med nøkkelen!</li>
+                        <li><strong>Prøve spenning:</strong> Mål at det er dødt. Test instrumentet på kjent kilde før og etter måling.</li>
+                        <li><strong>Jorde og kortslutte:</strong> <span style="color:red; font-weight:bold">KRITISK FOR SEID UTSTYR.</span> Dette tømmer kondensatorer og beskytter mot feilinnkobling.</li>
+                        <li><strong>Beskytte mot andre deler:</strong> Dekk til nabokomponenter som har strøm (f.eks. tilførsel før hovedbryter).</li>
+                    </ol>
+                `
+            },
+            {
+                title: "Modul 5: Førstehjelp og Beredskap",
+                html: `
+                    <h2>Akutt Førstehjelp ved Strømulykker</h2>
+                    <p>Husk kjeden som redder liv: <em>Tidlig varsling -> Tidlig HLR -> Tidlig defibrillering.</em></p>
+
+                    <h3>1. Frigjøring (Ivareta egen sikkerhet)</h3>
+                    <p>Ikke ta på en person som henger fast i strømmen! Kutt strømmen umiddelbart. Hvis ikke mulig: Bruk vår isolerstang eller en tørr gjenstand til å slå personen løs.</p>
+
+                    <h3>2. Varsling</h3>
+                    <ul>
+                        <li>Norge: <strong>113</strong></li>
+                        <li>Europa (EU): <strong>112</strong></li>
+                        <li>USA: <strong>911</strong></li>
+                    </ul>
+
+                    <h3>3. Behandling</h3>
+                    <ul>
+                        <li><strong>Bevisstløs uten pust:</strong> Start HLR (30 kompresjoner, 2 innblåsinger). Ikke stopp før ambulanse overtar.</li>
+                        <li><strong>Bevisstløs med pust:</strong> Stabilt sideleie. Overvåk pusten kontinuerlig.</li>
+                        <li><strong>Brannskader:</strong> Kjøl ned med lunkent vann (ca 20°C) i 20 minutter. Ikke bruk iskaldt vann (fare for hypotermi/sjokk).</li>
+                    </ul>
+                    
+                    <div class="warning-box">
+                        <strong>Meldeplikt:</strong> Alle ulykker med personskade og tilløp til ulykker (nestenulykker) skal rapporteres i Seid sitt HMS-system og potensielt til DSB.
+                    </div>
+
+                    <div class="danger-box">
+                        <strong>Viktig regel:</strong> Alle som har fått strøm gjennom kroppen (hånd-til-hånd eller hånd-til-fot) SKAL til sykehus for EKG-overvåkning, selv om de føler seg bra. Hjerteflimmer kan oppstå opptil 24 timer senere.
+                    </div>
+                `
+            },
+            {
+                title: "Kunnskapstest (Eksamen)",
+                type: "quiz",
+                questions: [
+                    {
+                        q: "Hva er det første du gjør hvis en kollega 'henger fast' i strømmen?",
+                        options: ["Drar ham løs med bare hendene", "Kutter strømmen eller bruker isolert gjenstand", "Ringer 113"],
+                        ans: 1
+                    },
+                    {
+                        q: "Hvor ofte må FSE-kurset fornyes?",
+                        options: ["Hvert 2. år", "Hvert 5. år", "Hver 12. måned"],
+                        ans: 2
+                    },
+                    {
+                        q: "Hvorfor er jording og kortslutning spesielt viktig på Seid SMPS-utstyr?",
+                        options: ["For å bedre signalet", "For å tømme kondensatorer (lagret energi) og sikre mot innkobling", "Det er ikke viktig"],
+                        ans: 1
+                    },
+                    {
+                        q: "En kollega fikk et støt (230V) gjennom armen, men sier han er OK. Hva gjør du?",
+                        options: ["Sender ham til lege/sykehus for EKG-sjekk", "Gir ham en kopp kaffe", "Ber ham gå hjem og sove"],
+                        ans: 0
+                    },
+                    {
+                        q: "Hva innebærer de 5 sikkerhetsreglene?",
+                        options: ["Jobb raskt så ingen ser deg", "Bruk hansker og vernebriller", "Frakoble, LOTO, Prøve, Jorde, Beskytte"],
+                        ans: 2
+                    }
+                ]
+            },
+            {
+                title: "Fullført",
+                type: "cert"
+            }
+        ],
+        en: [
+            {
+                title: "Welcome to FSE & Safety Training",
+                html: `
+                    <h1>Annual FSE Update</h1>
+                    <p>This course is tailored for employees of <strong>Seid AS</strong>. It covers the regulatory requirements in <em>Safety regulations related to work on and operation of electrical installations (FSE)</em>, with a focus on our specific context:</p>
+                    <ul>
+                        <li>International assignments and foreign grid systems.</li>
+                        <li>SMPS High Voltage power supplies (400V 3-phase input).</li>
+                        <li>Dangers of DC-link and capacitors.</li>
+                    </ul>
+                    <div class="highlight-box">
+                        <strong>Requirement:</strong> This course must be completed every 12 months. Note: Practical First Aid (CPR) training is required in addition to this theory module.
+                    </div>
+                    <p>Please enter your name to initialize the certificate:</p>
+                    <input type="text" id="inputName" class="name-input" placeholder="Your full name" oninput="updateName(this.value)">
+                `
+            },
+            {
+                title: "Module 1: Roles and Responsibilities",
+                html: `
+                    <h2>Who is in charge?</h2>
+                    <p>When working globally, roles can be confusing. Norwegian law defines specific roles (Operations Manager, Safety Lead), but local laws vary.</p>
+                    
+                    <h3>Seid AS vs. Local Electrician</h3>
+                    <p>The interface is critical. We supply the equipment, but the <strong>local electrician</strong> connects the grid to our terminals.</p>
+                    <ul>
+                        <li><strong>Your responsibility:</strong> Safety of the SMPS unit, DC-Link and commissioning.</li>
+                        <li><strong>Local responsibility:</strong> Safety of the supply cable up to the input terminals.</li>
+                    </ul>
+                    <div class="warning-box">
+                        <strong>Scenario:</strong> The electrician says "Power is Off". Do you trust him? <br>
+                        <strong>Answer:</strong> No. You must <em>always</em> verify with your own instrument. Under FSE, you are responsible for your own safety (LFS) unless otherwise documented.
+                    </div>
+                `
+            },
+            {
+                title: "Module 2: Planning & SJA",
+                html: `
+                    <h2>Safe Job Analysis (SJA)</h2>
+                    <p>Accidents often happen during "routine work". An SJA must be performed <em>before</em> opening the toolbox.</p>
+                    
+                    <h3>Risk Assessment for Seid Equipment</h3>
+                    <p>Working with SMPS units introduces hazards that domestic electricians don't face:</p>
+                    <ul>
+                        <li><strong>High Energy Density:</strong> 400V 3-phase has massive short-circuit potential. Arc flashes here are explosive.</li>
+                        <li><strong>Stored Energy (Capacitors):</strong> Even if the fuse is pulled (LOTO), the DC-link can hold lethal voltage for minutes.</li>
+                        <li><strong>HF Noise/Leakage:</strong> Can affect measurement instruments if not rated correctly.</li>
+                    </ul>
+                    <p>The SJA form must be filled out on-site, considering the environment (wet? confined? other workers nearby?).</p>
+                `
+            },
+            {
+                title: "Module 3: Physics of Injury",
+                html: `
+                    <h2>Shock vs Arc Flash</h2>
+                    
+                    <h3>Electric Shock</h3>
+                    <p>With 400V AC, there is a high risk of muscle tetanus (freezing to the line). Current flows through the body causing:</p>
+                    <ul>
+                        <li>Nerve damage.</li>
+                        <li>Cardiac Arrhythmia.</li>
+                        <li>Internal organ burns.</li>
+                    </ul>
+
+                    <h3>Arc Flash</h3>
+                    <p>A short circuit at our input terminals can create temps up to 20,000 °C. This causes:</p>
+                    <ul>
+                        <li>Pressure waves (blast).</li>
+                        <li>Molten metal (copper expands 67,000 times).</li>
+                        <li>Blindness (UV radiation).</li>
+                    </ul>
+                    <div class="danger-box">
+                        <strong>PPE Requirement:</strong> Always use a visor and flame-retardant clothing when voltage testing or switching main power.
+                    </div>
+                `
+            },
+            {
+                title: "Module 4: Work Methods",
+                html: `
+                    <h2>The 3 Work Methods</h2>
+                    <ol>
+                        <li>Work on de-energized systems (Our standard).</li>
+                        <li>Work near live parts.</li>
+                        <li>Live working (AUS) - (Only for troubleshooting control circuits < 50V or specialized tasks).</li>
+                    </ol>
+
+                    <h3>The 5 Safety Rules (For de-energizing)</h3>
+                    <p>Must be followed in order:</p>
+                    <ol>
+                        <li><strong>Disconnect:</strong> Open the breaker/fuse.</li>
+                        <li><strong>Lock Out / Tag Out (LOTO):</strong> Use a padlock and sign. Keep the key!</li>
+                        <li><strong>Verify absence of voltage:</strong> Test your instrument before and after.</li>
+                        <li><strong>Ground and Short-circuit:</strong> <span style="color:red">CRITICAL FOR SEID UNITS.</span> This discharges capacitors.</li>
+                        <li><strong>Protect adjacent live parts:</strong> Cover nearby components.</li>
+                    </ol>
+                `
+            },
+            {
+                title: "Module 5: First Aid",
+                html: `
+                    <h2>Acute First Aid</h2>
+                    <p>Remember the Chain of Survival: <em>Early Call -> Early CPR -> Early Defibrillation.</em></p>
+
+                    <h3>1. Safety First</h3>
+                    <p>Do not touch a victim attached to the power! Cut power or use an insulated stick to push them away.</p>
+
+                    <h3>2. Alert</h3>
+                    <ul>
+                        <li>Norway: <strong>113</strong></li>
+                        <li>EU: <strong>112</strong></li>
+                        <li>USA: <strong>911</strong></li>
+                    </ul>
+
+                    <h3>3. Treatment</h3>
+                    <ul>
+                        <li><strong>Unconscious, no breathing:</strong> Start CPR (30 compressions, 2 breaths).</li>
+                        <li><strong>Unconscious, breathing:</strong> Recovery position. Monitor breathing.</li>
+                        <li><strong>Burns:</strong> Cool with lukewarm water (20°C) for 20 minutes. Avoid ice cold water.</li>
+                    </ul>
+                    
+                    <div class="danger-box">
+                        <strong>Rule:</strong> Anyone who receives a shock through the body MUST go to the hospital for ECG monitoring, even if they feel fine. 
+                    </div>
+                `
+            },
+            {
+                title: "Final Exam",
+                type: "quiz",
+                questions: [
+                    {
+                        q: "What is the first step if a colleague is 'frozen' to a live wire?",
+                        options: ["Pull them off with bare hands", "Cut power or use insulated stick", "Call 911"],
+                        ans: 1
+                    },
+                    {
+                        q: "How often must FSE training be renewed?",
+                        options: ["Every 2 years", "Every 5 years", "Every 12 months"],
+                        ans: 2
+                    },
+                    {
+                        q: "Why is Grounding & Short-circuiting vital on Seid SMPS units?",
+                        options: ["To improve signals", "To discharge capacitors (stored energy)", "It's not important"],
+                        ans: 1
+                    },
+                    {
+                        q: "A colleague got a shock (230V) but feels fine. What do you do?",
+                        options: ["Send to hospital for checkup", "Give them coffee", "Tell them to go home"],
+                        ans: 0
+                    },
+                    {
+                        q: "What are the 5 safety rules?",
+                        options: ["Work fast", "Use gloves", "Disconnect, LOTO, Verify, Ground, Protect"],
+                        ans: 2
+                    }
+                ]
+            },
+            {
+                title: "Completed",
+                type: "cert"
+            }
+        ]
+    };
+
+    // --- Core Functions ---
+
+    function init() {
+        renderSlide();
+    }
+
+    function setLang(lang) {
+        currentLang = lang;
+        document.getElementById('btn-no').classList.remove('active');
+        document.getElementById('btn-en').classList.remove('active');
+        document.getElementById(`btn-${lang}`).classList.add('active');
+        
+        // Preserve name input if exists
+        const nameInput = document.getElementById('inputName');
+        if(nameInput) userName = nameInput.value;
+
+        renderSlide();
+    }
+
+    function updateName(val) {
+        userName = val;
+    }
+
+    function changeSlide(direction) {
+        // Validation: Name required on slide 0
+        if(currentSlide === 0 && direction === 1 && userName.trim().length < 2) {
+            alert(currentLang === 'no' ? "Vennligst skriv inn navnet ditt." : "Please enter your name.");
+            return;
+        }
+
+        // Validation: Quiz must be passed
+        const slideData = content[currentLang][currentSlide];
+        if(slideData.type === 'quiz' && direction === 1) {
+             if(!validateQuiz()) return;
+        }
+
+        const newIndex = currentSlide + direction;
+        if(newIndex >= 0 && newIndex < content[currentLang].length) {
+            currentSlide = newIndex;
+            renderSlide();
+        }
+    }
+
+    function renderSlide() {
+        const data = content[currentLang][currentSlide];
+        const contentDiv = document.getElementById('contentArea');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const progress = document.getElementById('progressBar');
+        const pageInd = document.getElementById('pageIndicator');
+
+        // Update Progress
+        const percent = ((currentSlide) / (content[currentLang].length - 1)) * 100;
+        progress.style.width = percent + "%";
+        pageInd.innerText = `${currentSlide + 1} / ${content[currentLang].length}`;
+
+        // Render Content
+        if(data.type === 'quiz') {
+            renderQuiz(data);
+            nextBtn.innerText = currentLang === 'no' ? "Lever & Fullfør" : "Submit & Finish";
+        } else if (data.type === 'cert') {
+            renderCertificate();
+            nextBtn.style.display = 'none';
+            prevBtn.style.display = 'none';
+            pageInd.style.display = 'none';
+        } else {
+            contentDiv.innerHTML = data.html;
+            // Restore name if back on slide 0
+            if(currentSlide === 0 && userName) {
+                const input = document.getElementById('inputName');
+                if(input) input.value = userName;
+            }
+            nextBtn.innerText = currentLang === 'no' ? "Neste" : "Next";
+            nextBtn.style.display = 'inline-block';
+            prevBtn.style.display = 'inline-block';
+            pageInd.style.display = 'inline-block';
+        }
+
+        // Disable Prev on start
+        prevBtn.disabled = currentSlide === 0;
+    }
+
+    function renderQuiz(data) {
+        let html = `<h2>${data.title}</h2>`;
+        data.questions.forEach((q, index) => {
+            html += `<div class="quiz-question"><p><strong>${index+1}. ${q.q}</strong></p>`;
+            q.options.forEach((opt, oIndex) => {
+                html += `
+                    <label class="quiz-option">
+                        <input type="radio" name="q${index}" value="${oIndex}"> ${opt}
+                    </label>
+                `;
+            });
+            html += `</div>`;
+        });
+        document.getElementById('contentArea').innerHTML = html;
+    }
+
+    function validateQuiz() {
+        const data = content[currentLang][currentSlide];
+        let score = 0;
+        let answeredAll = true;
+
+        data.questions.forEach((q, index) => {
+            const radios = document.getElementsByName(`q${index}`);
+            let val = null;
+            for(let radio of radios) {
+                if(radio.checked) val = parseInt(radio.value);
+            }
+            
+            if(val === null) answeredAll = false;
+            if(val === q.ans) score++;
+        });
+
+        if(!answeredAll) {
+            alert(currentLang === 'no' ? "Du må svare på alle spørsmålene." : "Please answer all questions.");
+            return false;
+        }
+
+        const passRate = 0.8; // 80%
+        const needed = Math.ceil(data.questions.length * passRate);
+
+        if(score >= needed) {
+            return true;
+        } else {
+            alert(currentLang === 'no' 
+                ? `Du fikk ${score} av ${data.questions.length} riktige. Du må ha minst ${needed}. Prøv igjen.` 
+                : `You got ${score} out of ${data.questions.length}. You need at least ${needed}. Try again.`);
+            return false;
+        }
+    }
+
+    function renderCertificate() {
+        const date = new Date().toLocaleDateString(currentLang === 'no' ? 'no-NO' : 'en-GB');
+        const html = `
+            <div id="certificate-view">
+                <div class="cert-logo">SEID<span>.</span> | ACADEMY</div>
+                <div class="cert-title">CERTIFICATE</div>
+                <p>${currentLang === 'no' ? 'Det bekreftes herved at' : 'This certifies that'}</p>
+                <div class="cert-name">${userName}</div>
+                <p>${currentLang === 'no' ? 'har fullført og bestått teoretisk' : 'has completed and passed theoretical'}</p>
+                <h2>FSE Low Voltage & Safety Course</h2>
+                <div class="cert-details">
+                    <p><strong>Modules Covered:</strong> Roles, Risk Assessment (SJA), Arc Flash/Shock Physics,<br>Work Methods (FSE §14-16) & Acute First Aid Theory.</p>
+                    <p><strong>Scope:</strong> Seid AS International Operations & SMPS/DC-Link Safety.</p>
+                    <p><em>Date: ${date} - Valid for 12 months</em></p>
+                </div>
+                <div class="no-print" style="margin-top: 50px; border-top: 1px solid #eee; padding-top: 20px;">
+                    <p style="color: #d9534f; font-weight: bold; font-size: 0.9rem;">
+                        ${currentLang === 'no' 
+                        ? 'HUSK: Send denne PDF-en til personalansvarlig for arkivering!' 
+                        : 'REMEMBER: Send this PDF to HR for archiving!'}
+                    </p>
+                    <button onclick="window.print()" class="btn btn-primary">
+                        ${currentLang === 'no' ? 'Last ned PDF / Skriv ut' : 'Download PDF / Print'}
+                    </button>
+                </div>
+            </div>
+        `;
+        document.getElementById('contentArea').innerHTML = html;
+        document.querySelector('.progress-container').style.display = 'none';
+    }
+
+    // Initialize
+    init();
+
+</script>
+
+</body>
+</html>
