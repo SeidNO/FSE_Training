@@ -1,3 +1,7 @@
+export const meta = {
+    revision: "2025-12-04"
+};
+
 export const content = {
     no: [
         {
@@ -113,7 +117,7 @@ export const content = {
             <p>Husk kjeden som redder liv: <em>Tidlig varsling -> Tidlig HLR -> Tidlig defibrillering.</em></p>
 
             <h3>1. Frigjøring (Ivareta egen sikkerhet)</h3>
-            <p>Ikke ta på en person som henger fast i strømmen! Kutt strømmen umiddelbart. Hvis ikke mulig: Bruk vår isolerstang eller en tørr gjenstand til å slå personen løs.</p>
+            <p>Ikke ta på en person som henger fast i strømmen! Kutt strømmen umiddelbart. Hvis ikke mulig: Bruk en isolert stang eller en tørr gjenstand til å slå personen løs.</p>
 
             <h3>2. Varsling</h3>
             <ul>

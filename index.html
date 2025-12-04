@@ -24,6 +24,9 @@
     <div class="top-bar">
         <div class="logo"><img src="images/Seid_logo.png" alt="Seid AS"></div>
         <div class="lang-switch">
+            <button id="btn-pdf" onclick="renderFullCourse()"
+                style="margin-right: 15px; border: 1px solid #ccc; background: #fff; color: #333; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600;">Last
+                ned PDF</button>
             <button id="btn-no" class="active" onclick="setLang('no')" aria-pressed="true">Norsk</button>
             <button id="btn-en" onclick="setLang('en')" aria-pressed="false">English</button>
         </div>
@@ -35,20 +38,17 @@
             <div class="progress-bar" id="progressBar"></div>
         </div>
 
-        <div class="content-area" id="contentArea">
-            <!-- Content Injected Here -->
+        <div id="contentArea" class="content-area">
+            <!-- Dynamic Content Loads Here -->
         </div>
 
         <div class="nav-footer">
-            <button class="btn btn-secondary" id="prevBtn" onclick="changeSlide(-1)">Forrige</button>
-            <span id="pageIndicator" style="color: #888; font-size: 0.9rem; font-weight: 600;">1 / 8</span>
-            <button class="btn btn-primary" id="nextBtn" onclick="changeSlide(1)">Neste</button>
+            <button id="prevBtn" onclick="changeSlide(-1)">Forrige</button>
+            <span id="pageIndicator"></span>
+            <button id="nextBtn" onclick="changeSlide(1)">Neste</button>
         </div>
     </div>
-
-    <!-- Main Entry Point -->
     <script type="module" src="js/main.js"></script>
-
 </body>
 
 </html>

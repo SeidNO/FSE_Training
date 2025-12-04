@@ -456,3 +456,18 @@ input.name-input:focus {
         font-size: 0.85rem !important;
     }
 }
+
+/* Override print styles to fix truncation */
+@media print {
+    .course-canvas {
+        display: block !important;
+        overflow: visible !important;
+        height: auto !important;
+    }
+
+    .content-area {
+        display: block !important;
+        overflow: visible !important;
+        height: auto !important;
+    }
+}

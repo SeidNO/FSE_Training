@@ -1,4 +1,4 @@
-import { content } from '../data/content.js';
+import { content, meta } from '../data/content.js';
 import { state, saveState, resetState } from './state.js';
 
 export function init() {
@@ -7,6 +7,7 @@ export function init() {
     window.changeSlide = changeSlide;
     window.updateName = updateName;
     window.resetCourse = resetState;
+    window.renderFullCourse = renderFullCourse;
 
     // Ensure the initial render happens based on loaded state
     // We need to set the active buttons correctly first if state was loaded
@@ -188,6 +189,7 @@ function renderCertificate() {
             <p><strong>Modules Covered:</strong> Roles, Risk Assessment (SJA), Arc Flash/Shock Physics,<br>Work Methods (FSE §14-16) & Acute First Aid Theory.</p>
             <p><strong>Scope:</strong> Seid AS International Operations & SMPS/DC-Link Safety.</p>
             <p><em>Date: ${date} - Valid for 12 months</em></p>
+            <p style="font-size: 0.7rem; color: #999; margin-top: 5px;">Rev. ${meta.revision}</p>
         </div>
         <div class="no-print" style="margin-top: 50px; border-top: 1px solid #eee; padding-top: 20px;">
             <p style="color: #d9534f; font-weight: bold; font-size: 0.9rem;">
@@ -206,4 +208,72 @@ function renderCertificate() {
 `;
     document.getElementById('contentArea').innerHTML = html;
     document.querySelector('.progress-container').style.display = 'none';
+}
+
+export function renderFullCourse() {
+    const password = prompt(state.currentLang === 'no' ? "Skriv inn passord for å laste ned:" : "Enter password to download:");
+    if (password !== "Seid2025") {
+        alert(state.currentLang === 'no' ? "Feil passord." : "Incorrect password.");
+        return;
+    }
+
+    const allSlides = content[state.currentLang];
+    let html = `<div class="full-course-view">`;
+
+    // Add Header for Print
+    html += `
+        <div class="print-header" style="text-align: center; margin-bottom: 40px; border-bottom: 2px solid #333; padding-bottom: 20px;">
+            <h1>Seid AS - FSE & Safety Training</h1>
+            <p>Full Course Content - ${new Date().toLocaleDateString()}</p>
+        </div>
+    `;
+
+    allSlides.forEach((slide, index) => {
+        if (slide.type === 'cert') return; // Skip certificate in full view
+
+        html += `<div class="slide-print-container" style="page-break-after: always; margin-bottom: 50px; border-bottom: 1px dashed #ccc; padding-bottom: 50px;">`;
+
+        if (slide.type === 'quiz') {
+            html += `<h2>${slide.title}</h2>`;
+            slide.questions.forEach((q, qIdx) => {
+                html += `<div class="quiz-item" style="margin-bottom: 20px;">
+                    <p><strong>${qIdx + 1}. ${q.q}</strong></p>
+                    <ul>
+                        ${q.options.map((opt, oIdx) => `<li style="${oIdx === q.ans ? 'font-weight:bold; color:green;' : ''}">${opt} ${oIdx === q.ans ? '(Correct)' : ''}</li>`).join('')}
+                    </ul>
+                 </div>`;
+            });
+        } else {
+            // Add slide number
+            html += `<div style="font-size: 0.8rem; color: #666; margin-bottom: 10px;">Slide ${index + 1}</div>`;
+
+            // Add Image if applicable (Slides 0-5)
+            if (index <= 5) {
+                html += `<div class="slide-sprite slide-sprite-${index}" style="width: 50%; margin: 0 auto 20px auto;"></div>`;
+            }
+            html += slide.html;
+        }
+
+        html += `</div>`;
+    });
+
+    html += `</div>`;
+
+    // Hide UI elements
+    document.querySelector('.progress-container').style.display = 'none';
+    document.querySelector('.nav-footer').style.display = 'none';
+
+    const contentArea = document.getElementById('contentArea');
+    contentArea.innerHTML = html;
+
+    // Add print button at the top
+    const printBtn = document.createElement('button');
+    printBtn.className = 'btn btn-primary no-print';
+    printBtn.innerText = state.currentLang === 'no' ? 'Skriv ut til PDF' : 'Print to PDF';
+    printBtn.onclick = () => window.print();
+    printBtn.style.marginBottom = '20px';
+    printBtn.style.display = 'block';
+    printBtn.style.margin = '0 auto 20px auto';
+
+    contentArea.insertBefore(printBtn, contentArea.firstChild);
 }
