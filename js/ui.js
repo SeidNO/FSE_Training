@@ -166,6 +166,11 @@ function validateQuiz() {
 function renderCertificate() {
     const date = new Date().toLocaleDateString(state.currentLang === 'no' ? 'no-NO' : 'en-GB');
 
+    // Update document title for print filename
+    const safeDate = new Date().toISOString().split('T')[0];
+    const safeFileName = state.userName.replace(/[^a-z0-9]/gi, '_');
+    document.title = `FSE_Certificate_${safeFileName}_${safeDate}`;
+
     // Safe way to handle user name to prevent XSS
     const safeName = document.createElement('div');
     safeName.textContent = state.userName;
@@ -173,7 +178,7 @@ function renderCertificate() {
 
     const html = `
     <div id="certificate-view">
-        <div class="cert-logo">SEID<span>.</span> | ACADEMY</div>
+        <div class="cert-logo"><img src="images/Seid_logo.png" alt="Seid AS" style="height: 60px; width: auto;"> | ACADEMY</div>
         <div class="cert-title">CERTIFICATE</div>
         <p>${state.currentLang === 'no' ? 'Det bekreftes herved at' : 'This certifies that'}</p>
         <div class="cert-name">${safeNameStr}</div>

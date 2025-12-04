@@ -309,7 +309,7 @@ input[type="radio"] {
     /* Default block, logic handles showing/hiding content */
     text-align: center;
     padding: 60px;
-    border: 10px solid var(--primary-dark);
+    border: none;
     margin: 20px;
     background: white;
     position: relative;
@@ -373,13 +373,20 @@ input.name-input:focus {
 
 /* --- Print Styles (Completely Revised for Reliability) --- */
 @media print {
+    @page {
+        size: A4;
+        margin: 10mm;
+    }
 
     /* 1. Reset Page and Hide UI Chrome */
+    html,
     body {
         background: white;
         color: black;
         margin: 0;
         padding: 0;
+        width: 100%;
+        height: 100%;
     }
 
     .top-bar,
@@ -406,6 +413,7 @@ input.name-input:focus {
     .content-area {
         margin: 0 auto !important;
         width: 100% !important;
+        padding: 0 !important;
         box-sizing: border-box !important;
         page-break-inside: avoid;
         /* Try to keep it on one page */
@@ -414,6 +422,37 @@ input.name-input:focus {
     /* 3. Ensure Certificate looks good */
     #certificate-view {
         display: block !important;
-        border: 5px solid var(--primary-dark) !important;
+        border: none !important;
+        padding: 30px !important;
+        /* Reduced padding for print */
+        margin: 0 !important;
+        height: 95vh;
+        /* Use full height */
+        box-sizing: border-box;
+        display: flex !important;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .cert-logo {
+        margin-bottom: 20px !important;
+    }
+
+    .cert-title {
+        font-size: 2.5rem !important;
+        margin-bottom: 5px !important;
+    }
+
+    .cert-name {
+        font-size: 2rem !important;
+        margin: 15px 0 !important;
+        min-width: auto !important;
+        width: 80%;
+    }
+
+    .cert-details {
+        margin-top: 20px !important;
+        font-size: 0.85rem !important;
     }
 }
