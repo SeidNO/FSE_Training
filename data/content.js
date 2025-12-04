@@ -10,8 +10,9 @@ export const content = {
                 <strong>Fokusområder for Seid AS:</strong>
                 <ul style="margin-bottom:0; margin-top: 10px;">
                     <li>Internasjonale oppdrag og fremmede nettsystemer.</li>
-                    <li>SMPS høyspent strømforsyninger (400V 3-fase input).</li>
-                    <li>Farene ved DC-link og kondensatorer (Lagret energi).</li>
+                    <li><strong>ModuPower</strong> høyspent strømforsyninger (SMPS).</li>
+                    <li><strong>Høyspent utgang</strong> mot ESP og ModuPlasma reaktorkamre.</li>
+                    <li>Farene ved lagret energi (kondensatorer) og indusert spenning.</li>
                 </ul>
             </div>
 
@@ -31,7 +32,7 @@ export const content = {
             <p>Grensesnittet er kritisk. Vi leverer utstyret, men <strong>lokal installatør/elektriker</strong> kobler ofte nettet (grid) til våre klemmer.</p>
             <ul>
                 <li><strong>Leder for sikkerhet (LFS):</strong> Skal alltid være utpekt for arbeidet. Hvis ingen andre er utpekt, er DU ansvarlig for din egen sikkerhet.</li>
-                <li><strong>Ditt ansvar:</strong> Sikkerheten på selve SMPS-enheten, DC-link og tilkoblet last.</li>
+                <li><strong>Ditt ansvar:</strong> Sikkerheten på selve <strong>ModuPower</strong>-enheten, DC-link og tilkoblet last (ESP/ModuPlasma).</li>
                 <li><strong>Grensesnitt:</strong> Inntaksklemmer. Anta alltid at tilførselskabelen er spenningssatt inntil du selv har målt.</li>
             </ul>
             <div class="warning-box">
@@ -46,16 +47,16 @@ export const content = {
             <h2>Sikker Jobb Analyse (SJA)</h2>
             <p>FSE § 10 krever planlegging av alt arbeid. Ulykker skjer ofte ved "rutinearbeid" der vi hopper over planleggingen.</p>
             
-            <h3>Spesifikk risiko for Seid-utstyr</h3>
-            <p>Når vi jobber med Switch Mode Power Supplies, har vi farer som en vanlig husinstallatør ikke møter:</p>
+            <h3>Spesifikk risiko for ModuPower & Reaktorer</h3>
+            <p>Vi møter farer som en vanlig husinstallatør sjelden ser:</p>
             <ul>
-                <li><strong>Høy Energitetthet:</strong> 400V/480V 3-fase har enorm kortslutningsytelse. Lysbuer her er eksplosive.</li>
-                <li><strong>Lagret Energi (Kondensatorer):</strong> Dette er vår største interne fare. Selv om sikringen er ute (LOTO), kan DC-linken inneholde dødelig spenning i flere minutter.</li>
-                <li><strong>HF-støy/Lekkasjestrøm:</strong> Kan lure vanlige multimetere. Bruk egnet måleutstyr.</li>
+                <li><strong>Høy Energitetthet (Inntak):</strong> 400V/480V 3-fase har enorm kortslutningsytelse. Lysbuer her er eksplosive.</li>
+                <li><strong>Lagret Energi (Internt):</strong> DC-linken i ModuPower kan inneholde dødelig spenning i flere minutter etter at sikringen er ute.</li>
+                <li><strong>Reaktor/ESP (Utgang):</strong> Selve reaktorkammeret/filteret fungerer som en stor kondensator. Det kan holde på ladning, plukke opp statisk elektrisitet, eller ha indusert spenning fra nabofelt.</li>
             </ul>
             
-            <div class="highlight-box">
-                <strong>SJA i praksis:</strong> Stopp opp i 2 minutter før du åpner skapet. Er det vått? Er det trangt? Har jeg riktig verneutstyr? Hvis uhellet er ute, hvordan kommer jeg meg vekk?
+            <div class="danger-box">
+                <strong>Viktig om Induksjon:</strong> I store filteranlegg kan "døde" deler bli spenningssatt av elektromagnetiske felt fra naboseksjoner som er i drift. Utstyret <strong>MÅ</strong> jordes før berøring.
             </div>
         `
         },
@@ -100,7 +101,7 @@ export const content = {
                 <li><strong>Frakoble:</strong> Åpne bryter/sikring. Sørg for synlig brudd om mulig.</li>
                 <li><strong>Sikre mot innkobling:</strong> Bruk hengelås (LOTO) og skilt "Må ikke betjenes". Ta med nøkkelen!</li>
                 <li><strong>Prøve spenning:</strong> Mål at det er dødt. Test instrumentet på kjent kilde før og etter måling.</li>
-                <li><strong>Jorde og kortslutte:</strong> <span style="color:red; font-weight:bold">KRITISK FOR SEID UTSTYR.</span> Dette tømmer kondensatorer og beskytter mot feilinnkobling.</li>
+                <li><strong>Jorde og kortslutte:</strong> <span style="color:red; font-weight:bold">KRITISK FOR MODUPOWER/ESP.</span> Du må jorde både utgangen fra PSU og selve reaktorkammeret for å fjerne statisk/lagret ladning.</li>
                 <li><strong>Beskytte mot andre deler:</strong> Dekk til nabokomponenter som har strøm (f.eks. tilførsel før hovedbryter).</li>
             </ol>
         `
@@ -147,13 +148,8 @@ export const content = {
                     ans: 1
                 },
                 {
-                    q: "Hvor ofte må FSE-kurset fornyes?",
-                    options: ["Hvert 2. år", "Hvert 5. år", "Hver 12. måned"],
-                    ans: 2
-                },
-                {
-                    q: "Hvorfor er jording og kortslutning spesielt viktig på Seid SMPS-utstyr?",
-                    options: ["For å bedre signalet", "For å tømme kondensatorer (lagret energi) og sikre mot innkobling", "Det er ikke viktig"],
+                    q: "Hvorfor må ESP/ModuPlasma-kammeret jordes selv om strømmen er av?",
+                    options: ["For å forbedre signalet", "Pga. fare for lagret energi, statisk elektrisitet og induksjon", "Det er ikke nødvendig"],
                     ans: 1
                 },
                 {
@@ -162,9 +158,24 @@ export const content = {
                     ans: 0
                 },
                 {
+                    q: "Hvor ofte må FSE-kurset fornyes?",
+                    options: ["Hvert 2. år", "Hvert 5. år", "Hver 12. måned"],
+                    ans: 2
+                },
+                {
                     q: "Hva innebærer de 5 sikkerhetsreglene?",
                     options: ["Jobb raskt så ingen ser deg", "Bruk hansker og vernebriller", "Frakoble, LOTO, Prøve, Jorde, Beskytte"],
                     ans: 2
+                },
+                {
+                    q: "Hvorfor kan det være farlig å jobbe på en frakoblet ESP-seksjon?",
+                    options: ["Induksjon fra nabofelt og statisk ladning", "Fordi metallet er glatt", "Det er aldri farlig hvis sikringen er ute"],
+                    ans: 0
+                },
+                {
+                    q: "Hva er korrekt behandling av brannskader?",
+                    options: ["Iskaldt vann i 5 minutter", "Lunkent vann (20°C) i 20 minutter", "Aloe vera med en gang"],
+                    ans: 1
                 }
             ]
         },
@@ -181,8 +192,9 @@ export const content = {
             <p>This course is tailored for employees of <strong>Seid AS</strong>. It covers the regulatory requirements in <em>Safety regulations related to work on and operation of electrical installations (FSE)</em>, with a focus on our specific context:</p>
             <ul>
                 <li>International assignments and foreign grid systems.</li>
-                <li>SMPS High Voltage power supplies (400V 3-phase input).</li>
-                <li>Dangers of DC-link and capacitors.</li>
+                <li><strong>ModuPower</strong> High Voltage power supplies (SMPS).</li>
+                <li><strong>HV Output</strong> to ESP and ModuPlasma reactor chambers.</li>
+                <li>Dangers of stored energy, static charge, and induction.</li>
             </ul>
             <div class="highlight-box">
                 <strong>Requirement:</strong> This course must be completed every 12 months. Note: Practical First Aid (CPR) training is required in addition to this theory module.
@@ -200,7 +212,7 @@ export const content = {
             <h3>Seid AS vs. Local Electrician</h3>
             <p>The interface is critical. We supply the equipment, but the <strong>local electrician</strong> connects the grid to our terminals.</p>
             <ul>
-                <li><strong>Your responsibility:</strong> Safety of the SMPS unit, DC-Link and commissioning.</li>
+                <li><strong>Your responsibility:</strong> Safety of the <strong>ModuPower</strong> unit, DC-Link, and the connected load (ESP/ModuPlasma).</li>
                 <li><strong>Local responsibility:</strong> Safety of the supply cable up to the input terminals.</li>
             </ul>
             <div class="warning-box">
@@ -215,14 +227,17 @@ export const content = {
             <h2>Safe Job Analysis (SJA)</h2>
             <p>Accidents often happen during "routine work". An SJA must be performed <em>before</em> opening the toolbox.</p>
             
-            <h3>Risk Assessment for Seid Equipment</h3>
-            <p>Working with SMPS units introduces hazards that domestic electricians don't face:</p>
+            <h3>Specific Risks: ModuPower & Reactors</h3>
+            <p>We face hazards that domestic electricians rarely see:</p>
             <ul>
-                <li><strong>High Energy Density:</strong> 400V 3-phase has massive short-circuit potential. Arc flashes here are explosive.</li>
-                <li><strong>Stored Energy (Capacitors):</strong> Even if the fuse is pulled (LOTO), the DC-link can hold lethal voltage for minutes.</li>
-                <li><strong>HF Noise/Leakage:</strong> Can affect measurement instruments if not rated correctly.</li>
+                <li><strong>High Energy Density (Input):</strong> 400V/480V 3-phase has massive short-circuit potential. Arc flashes here are explosive.</li>
+                <li><strong>Stored Energy (Internal):</strong> The DC-link in ModuPower can hold lethal voltage for minutes after LOTO.</li>
+                <li><strong>Reactor/ESP (Output):</strong> The reactor chamber acts as a massive capacitor. It can retain charge, build up static electricity, or hold induced voltage from neighboring fields.</li>
             </ul>
-            <p>The SJA form must be filled out on-site, considering the environment (wet? confined? other workers nearby?).</p>
+            
+            <div class="danger-box">
+                <strong>Induction Hazard:</strong> In large filter plants, "dead" parts can become energized by electromagnetic fields from neighboring sections still in operation. The equipment <strong>MUST</strong> be grounded before touch.
+            </div>
         `
         },
         {
@@ -231,7 +246,7 @@ export const content = {
             <h2>Shock vs Arc Flash</h2>
             
             <h3>Electric Shock</h3>
-            <p>With 400V AC, there is a high risk of muscle tetanus (freezing to the line). Current flows through the body causing:</p>
+            <p>With 400V AC, there is a high risk of muscle tetany (freezing to the line). Current flows through the body causing:</p>
             <ul>
                 <li>Nerve damage.</li>
                 <li>Cardiac Arrhythmia.</li>
@@ -266,7 +281,7 @@ export const content = {
                 <li><strong>Disconnect:</strong> Open the breaker/fuse.</li>
                 <li><strong>Lock Out / Tag Out (LOTO):</strong> Use a padlock and sign. Keep the key!</li>
                 <li><strong>Verify absence of voltage:</strong> Test your instrument before and after.</li>
-                <li><strong>Ground and Short-circuit:</strong> <span style="color:red">CRITICAL FOR SEID UNITS.</span> This discharges capacitors.</li>
+                <li><strong>Ground and Short-circuit:</strong> <span style="color:red">CRITICAL FOR MODUPOWER/ESP.</span> You must ground both the PSU output and the reactor chamber itself to discharge static/stored energy.</li>
                 <li><strong>Protect adjacent live parts:</strong> Cover nearby components.</li>
             </ol>
         `
@@ -294,6 +309,10 @@ export const content = {
                 <li><strong>Burns:</strong> Cool with lukewarm water (20°C) for 20 minutes. Avoid ice cold water.</li>
             </ul>
             
+            <div class="warning-box">
+                <strong>Reporting Duty:</strong> All accidents involving personal injury and "near-misses" must be reported in Seid's HMS system.
+            </div>
+
             <div class="danger-box">
                 <strong>Rule:</strong> Anyone who receives a shock through the body MUST go to the hospital for ECG monitoring, even if they feel fine. 
             </div>
@@ -309,13 +328,8 @@ export const content = {
                     ans: 1
                 },
                 {
-                    q: "How often must FSE training be renewed?",
-                    options: ["Every 2 years", "Every 5 years", "Every 12 months"],
-                    ans: 2
-                },
-                {
-                    q: "Why is Grounding & Short-circuiting vital on Seid SMPS units?",
-                    options: ["To improve signals", "To discharge capacitors (stored energy)", "It's not important"],
+                    q: "Why must the ESP/ModuPlasma chamber be grounded even if power is off?",
+                    options: ["To improve signal quality", "Risk of stored energy, static charge, and induction", "It is not necessary"],
                     ans: 1
                 },
                 {
@@ -324,9 +338,24 @@ export const content = {
                     ans: 0
                 },
                 {
+                    q: "How often must FSE training be renewed?",
+                    options: ["Every 2 years", "Every 5 years", "Every 12 months"],
+                    ans: 2
+                },
+                {
                     q: "What are the 5 safety rules?",
                     options: ["Work fast", "Use gloves", "Disconnect, LOTO, Verify, Ground, Protect"],
                     ans: 2
+                },
+                {
+                    q: "Why can touching a disconnected ESP section still be dangerous?",
+                    options: ["Induction from neighboring fields and static charge", "It is not dangerous if the fuse is pulled", "Because the metal is hot"],
+                    ans: 0
+                },
+                {
+                    q: "How should electrical burns be treated?",
+                    options: ["Ice cold water for 5 minutes", "Lukewarm water (20°C) for 20 minutes", "Apply ointment immediately"],
+                    ans: 1
                 }
             ]
         },
