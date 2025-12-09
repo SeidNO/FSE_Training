@@ -177,11 +177,19 @@ function renderSlide() {
     const progress = document.getElementById('progressBar');
     const pageInd = document.getElementById('pageIndicator');
     const pdfBtn = document.getElementById('btn-pdf');
+    const courseTitle = document.getElementById('courseTitle');
 
     // Show UI elements
     document.querySelector('.progress-container').style.display = 'block';
     document.querySelector('.nav-footer').style.display = 'flex';
     if (pdfBtn) pdfBtn.style.display = 'inline-block';
+
+    // Update Header Title
+    if (courseTitle) {
+        courseTitle.textContent = typeof activeCourse.title === 'object'
+            ? activeCourse.title[state.currentLang]
+            : activeCourse.title;
+    }
 
     // Update Progress
     const percent = ((currentSlideIndex) / (slides.length - 1)) * 100;
@@ -204,13 +212,36 @@ function renderSlide() {
         if (state.currentCourseId === 'fse' && currentSlideIndex <= 5) {
             contentHtml = `<div class="slide-sprite slide-sprite-${currentSlideIndex}"></div>` + contentHtml;
         }
+
+        // Header (New)
+        contentHtml = `<div class="slide-header">${data.title}</div>` + contentHtml;
+
         contentDiv.innerHTML = contentHtml;
 
-        // Restore name if back on slide 0
-        if (currentSlideIndex === 0 && state.userName) {
+        // Dynamic Name Input Injection on Slide 0
+        if (currentSlideIndex === 0) {
+            // Check if input already exists in content (legacy support)
+            if (!document.getElementById('inputName')) {
+                const inputLabel = state.currentLang === 'no'
+                    ? "<p>Vennligst skriv inn ditt fulle navn slik det skal stå på kursbeviset:</p>"
+                    : "<p>Please enter your full name as it should appear on the certificate:</p>";
+
+                const inputHtml = `
+                    <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+                        ${inputLabel}
+                        <input type="text" id="inputName" class="name-input" placeholder="${state.currentLang === 'no' ? 'Ditt fulle navn' : 'Your full name'}" oninput="window.updateName(this.value)">
+                    </div>
+                `;
+                contentDiv.insertAdjacentHTML('beforeend', inputHtml);
+            }
+
+            // Restore name value
             const input = document.getElementById('inputName');
-            if (input) input.value = state.userName;
+            if (input && state.userName) {
+                input.value = state.userName;
+            }
         }
+
         nextBtn.innerText = state.currentLang === 'no' ? "Neste" : "Next";
         nextBtn.style.display = 'inline-block';
         prevBtn.style.display = 'inline-block';
@@ -285,6 +316,14 @@ function renderCertificate() {
     safeName.textContent = state.userName;
     const safeNameStr = safeName.innerHTML;
 
+    // Expose retake function
+    window.retakeCourse = function () {
+        if (confirm(state.currentLang === 'no' ? "Er du sikker på at du vil ta kurset på nytt?" : "Are you sure you want to retake the course?")) {
+            setCurrentSlideIndex(0);
+            renderSlide();
+        }
+    };
+
     const html = `
     <div id="certificate-view">
         <div class="cert-logo"><img src="images/Seid_logo.png" alt="Seid AS" style="height: 60px; width: auto;"> | ACADEMY</div>
@@ -309,6 +348,9 @@ function renderCertificate() {
             </button>
             <button onclick="window.goToDashboard()" class="btn btn-secondary" style="margin-left: 10px;">
                  ${state.currentLang === 'no' ? 'Tilbake til meny' : 'Back to Menu'}
+            </button>
+             <button onclick="window.retakeCourse()" class="btn btn-secondary" style="margin-left: 10px; border-color: #f0ad4e; color: #f0ad4e;">
+                 ${state.currentLang === 'no' ? 'Ta kurset på nytt' : 'Retake Course'}
             </button>
         </div>
     </div>

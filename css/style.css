@@ -521,3 +521,28 @@ input.name-input:focus {
         height: auto !important;
     }
 }
+
+/* --- Course Header Title (New) --- */
+.course-header-title {
+    flex: 1;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin: 0 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* --- Slide Content Headers --- */
+.slide-header {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-light);
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 5px;
+    margin-bottom: 20px;
+    font-weight: 700;
+}

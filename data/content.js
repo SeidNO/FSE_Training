@@ -26,8 +26,7 @@ export const courses = {
         
                     <p><strong>Merk:</strong> Dette kurset dekker teoridelen. Praktisk øvelse i hjerte-lungeredning (HLR) og gjennomgang av førstehjelpsutstyr må gjennomføres separat for full godkjenning.</p>
                     
-                    <p>Vennligst skriv inn ditt fulle navn slik det skal stå på kursbeviset:</p>
-                    <input type="text" id="inputName" class="name-input" placeholder="Ditt fulle navn" oninput="window.updateName(this.value)">
+                    <p><strong>Merk:</strong> Dette kurset dekker teoridelen. Praktisk øvelse i hjerte-lungeredning (HLR) og gjennomgang av førstehjelpsutstyr må gjennomføres separat for full godkjenning.</p>
                 `
                 },
                 {
@@ -207,8 +206,6 @@ export const courses = {
                     <div class="highlight-box">
                         <strong>Requirement:</strong> This course must be completed every 12 months. Note: Practical First Aid (CPR) training is required in addition to this theory module.
                     </div>
-                    <p>Please enter your name to initialize the certificate:</p>
-                    <input type="text" id="inputName" class="name-input" placeholder="Your full name" oninput="window.updateName(this.value)">
                 `
                 },
                 {
@@ -385,7 +382,7 @@ export const courses = {
             no: [
                 {
                     title: "Hvorfor førstehjelp?",
-                    html: "<h2>Du er den viktigste brikken</h2><p>Mange tror at det viktigste i en ulykke er hvor raskt ambulansen kommer, men realiteten er at innsatsen som gjøres <em>før</em> nødetatene ankommer, ofte avgjør om pasienten overlever. I Norge kan det ta tid før ambulansen når frem, spesielt utenfor bykjernene.</p><h3>Hjernen dør raskt</h3><p>Hjernen er ekstremt sårbar for oksygenmangel. Allerede etter 3–4 minutter uten oksygentilførsel begynner hjerneceller å dø. Etter 10 minutter er sjansen for å overleve minimal uten livreddende tiltak.</p><h3>Din innsats teller</h3><p>Statistikk viser at umiddelbar førstehjelp kan mangedoble sjansen for overlevelse. Din rolle er å kjøpe tid – å holde en minimal blodsirkulasjon i gang slik at hjernen får nok oksygen til at helsepersonell kan ta over. Det er bedre å gjøre litt feil enn å ikke gjøre noe som helst.</p>"
+                    html: "<h1>Du er den viktigste brikken</h1><p>Mange tror at det viktigste i en ulykke er hvor raskt ambulansen kommer, men realiteten er at innsatsen som gjøres <em>før</em> nødetatene ankommer, ofte avgjør om pasienten overlever. I Norge kan det ta tid før ambulansen når frem, spesielt utenfor bykjernene.</p><h3>Hjernen dør raskt</h3><p>Hjernen er ekstremt sårbar for oksygenmangel. Allerede etter 3–4 minutter uten oksygentilførsel begynner hjerneceller å dø. Etter 10 minutter er sjansen for å overleve minimal uten livreddende tiltak.</p><h3>Din innsats teller</h3><p>Statistikk viser at umiddelbar førstehjelp kan mangedoble sjansen for overlevelse. Din rolle er å kjøpe tid – å holde en minimal blodsirkulasjon i gang slik at hjernen får nok oksygen til at helsepersonell kan ta over. Det er bedre å gjøre litt feil enn å ikke gjøre noe som helst.</p>"
                 },
                 {
                     title: "Kjeden som redder liv",
@@ -424,6 +421,7 @@ export const courses = {
                     html: "<h2>Den usynlige skaden</h2><p>Strømgjennomgang forårsaker ofte brannskader. Det skumle med strøm er at strømmen følger blodårer, nerver og muskler gjennom kroppen. Derfor kan huden se nesten uskadd ut (kanskje bare små inn- og utgangsmerker), mens det er store skader innvendig.</p><h3>Behandling: Kjøling</h3><p>Kjøling begrenser skadeomfanget og lindrer smerte. Bruk lunkent vann (ca. 20 grader) i 20 minutter. Ikke bruk iskaldt vann eller snø, da dette får blodårene til å trekke seg sammen, noe som reduserer blodsirkulasjonen til det skadde vevet og kan forverre skaden.</p><p><strong>Husk:</strong> Alle som har hatt strømgjennomgang gjennom kroppen skal til sykehus for sjekk av hjerterytme og nyrefunksjon, selv om de føler seg helt friske.</p>"
                 },
                 {
+                    title: "Kunnskapstest (Eksamen)",
                     type: "quiz",
                     questions: [
                         {
@@ -483,7 +481,7 @@ export const courses = {
                         {
                             q: "Hvor lenge skal du sjekke om en person puster?",
                             options: [
-                                "Maks 10 sekunder",
+                                "Minimum 10 sekunder",
                                 "Minst 1 minutt",
                                 "Så lenge som mulig"
                             ],
@@ -547,6 +545,7 @@ export const courses = {
                     html: "<h2>The Invisible Injury</h2><p>Electric shock often causes burns. The danger with electricity is that current follows blood vessels, nerves, and muscles through the body. The skin might look mostly fine (perhaps just small entry/exit marks), while there is massive internal damage.</p><h3>Treatment: Cooling</h3><p>Cooling limits damage and relieves pain. Use lukewarm water (approx. 20°C) for 20 minutes. Do not use ice-cold water or snow, as this causes blood vessels to constrict, reducing circulation to the injured tissue and potentially worsening the injury.</p><p><strong>Remember:</strong> Anyone who has had electricity pass through their body must go to the hospital to check heart rhythm and kidney function, even if they feel fine.</p>"
                 },
                 {
+                    title: "Knowledge Test",
                     type: "quiz",
                     questions: [
                         {
@@ -606,7 +605,7 @@ export const courses = {
                         {
                             q: "How long should you check if a person is breathing?",
                             options: [
-                                "Max 10 seconds",
+                                "Minimum 10 seconds",
                                 "At least 1 minute",
                                 "As long as possible"
                             ],
