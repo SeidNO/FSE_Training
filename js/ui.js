@@ -1,37 +1,59 @@
-import { content, meta } from '../data/content.js';
-import { state, saveState, resetState } from './state.js';
+import { courses } from '../data/content.js';
+import { state, saveState, resetState, getCurrentSlideIndex, setCurrentSlideIndex } from './state.js';
 
 export function init() {
-    // Bind global functions for HTML onclick attributes
+    // Bind global functions
     window.setLang = setLang;
     window.changeSlide = changeSlide;
     window.updateName = updateName;
     window.resetCourse = resetState;
     window.renderFullCourse = renderFullCourse;
+    window.loadCourse = loadCourse;
+    window.goToDashboard = goToDashboard;
 
-    // Ensure the initial render happens based on loaded state
-    // We need to set the active buttons correctly first if state was loaded
-    if (state.currentLang !== 'no') {
-        // If loaded language is not default, update UI buttons without re-rendering yet
-        document.getElementById('btn-no').classList.remove('active');
-        document.getElementById('btn-no').setAttribute('aria-pressed', 'false');
-        document.getElementById(`btn-${state.currentLang}`).classList.add('active');
-        document.getElementById(`btn-${state.currentLang}`).setAttribute('aria-pressed', 'true');
+    // Set initial language UI
+    updateLangUI();
+
+    if (!state.currentCourseId) {
+        renderDashboard();
+    } else {
+        // Course active
+        document.getElementById('btn-menu').style.display = 'inline-block';
+        // Validate if course exists
+        if (!courses[state.currentCourseId]) {
+            console.error("Course not found:", state.currentCourseId);
+            state.currentCourseId = null;
+            saveState();
+            renderDashboard();
+            return;
+        }
+        renderSlide();
     }
+}
 
-    renderSlide();
+export function goToDashboard() {
+    state.currentCourseId = null;
+    saveState();
+    window.location.reload();
+}
+
+function updateLangUI() {
+    document.getElementById('btn-no').classList.toggle('active', state.currentLang === 'no');
+    document.getElementById('btn-no').setAttribute('aria-pressed', state.currentLang === 'no');
+    document.getElementById('btn-en').classList.toggle('active', state.currentLang === 'en');
+    document.getElementById('btn-en').setAttribute('aria-pressed', state.currentLang === 'en');
+
+    // Update Menu Button Text
+    const menuBtn = document.getElementById('btn-menu');
+    if (menuBtn) {
+        menuBtn.innerHTML = state.currentLang === 'no' ? '&larr; Meny' : '&larr; Menu';
+        menuBtn.onclick = goToDashboard;
+    }
 }
 
 export function setLang(lang, render = true) {
     state.currentLang = lang;
-    document.getElementById('btn-no').classList.remove('active');
-    document.getElementById('btn-no').setAttribute('aria-pressed', 'false');
-
-    document.getElementById('btn-en').classList.remove('active');
-    document.getElementById('btn-en').setAttribute('aria-pressed', 'false');
-
-    document.getElementById(`btn-${lang}`).classList.add('active');
-    document.getElementById(`btn-${lang}`).setAttribute('aria-pressed', 'true');
+    updateLangUI();
 
     // Preserve name input if exists
     const nameInput = document.getElementById('inputName');
@@ -39,7 +61,75 @@ export function setLang(lang, render = true) {
 
     saveState();
 
-    if (render) renderSlide();
+    if (state.currentCourseId) {
+        if (render) renderSlide();
+    } else {
+        renderDashboard();
+    }
+}
+
+export function loadCourse(courseId) {
+    if (!courses[courseId]) return;
+    state.currentCourseId = courseId;
+    saveState();
+    // Reload to clean state or just re-render
+    // Re-rendering is faster but we need to show UI elements
+    document.getElementById('btn-menu').style.display = 'inline-block';
+    renderSlide();
+}
+
+function renderDashboard() {
+    const lang = state.currentLang;
+    const contentArea = document.getElementById('contentArea');
+
+    // Hide progress bar and footer
+    document.querySelector('.progress-container').style.display = 'none';
+    document.querySelector('.nav-footer').style.display = 'none';
+    document.getElementById('btn-pdf').style.display = 'none';
+    document.getElementById('btn-menu').style.display = 'none';
+
+    let html = `
+        <div class="dashboard-container" style="max-width: 800px; margin: 0 auto; text-align: center;">
+            <h1 style="margin-bottom: 40px;">Seid AS Academy</h1>
+            <div class="course-grid" style="display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+    `;
+
+    Object.values(courses).forEach(course => {
+        const title = typeof course.title === 'object' ? course.title[lang] : course.title;
+        const modules = course.content[lang].filter(m => m.type !== 'cert').length;
+
+        // Check progress
+        const current = state.courseProgress[course.id] || 0;
+        const total = course.content[lang].length;
+        const isComplete = current >= total - 1;
+
+        html += `
+            <div class="course-card" onclick="loadCourse('${course.id}')" style="
+                background: white; 
+                padding: 20px; 
+                border-radius: 8px; 
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+                cursor: pointer; 
+                transition: transform 0.2s; 
+                text-align: left; 
+                border-left: 5px solid ${isComplete ? '#4CAF50' : '#0056b3'};
+            " onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <h3 style="margin-top: 0; color: #333;">${title}</h3>
+                <p style="color: #666; font-size: 0.9rem;">Revision: ${course.revision}</p>
+                <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: bold; color: ${isComplete ? 'green' : '#0056b3'}">
+                        ${isComplete ? (lang === 'no' ? 'Fullført' : 'Completed') : (lang === 'no' ? 'Start' : 'Start')}
+                    </span>
+                    <span style="font-size: 0.8rem; background: #eee; padding: 2px 8px; border-radius: 10px;">
+                        ${modules} Moduler
+                    </span>
+                </div>
+            </div>
+        `;
+    });
+
+    html += `</div></div>`;
+    contentArea.innerHTML = html;
 }
 
 export function updateName(val) {
@@ -48,39 +138,56 @@ export function updateName(val) {
 }
 
 export function changeSlide(direction) {
+    const activeCourse = courses[state.currentCourseId];
+    if (!activeCourse) return;
+
+    const currentSlideIndex = getCurrentSlideIndex();
+    const slides = activeCourse.content[state.currentLang];
+
     // Validation: Name required on slide 0
-    if (state.currentSlide === 0 && direction === 1 && state.userName.trim().length < 2) {
+    if (currentSlideIndex === 0 && direction === 1 && state.userName.trim().length < 2) {
         alert(state.currentLang === 'no' ? "Vennligst skriv inn navnet ditt." : "Please enter your name.");
         return;
     }
 
     // Validation: Quiz must be passed
-    const slideData = content[state.currentLang][state.currentSlide];
+    const slideData = slides[currentSlideIndex];
     if (slideData.type === 'quiz' && direction === 1) {
-        if (!validateQuiz()) return;
+        if (!validateQuiz(slideData)) return;
     }
 
-    const newIndex = state.currentSlide + direction;
-    if (newIndex >= 0 && newIndex < content[state.currentLang].length) {
-        state.currentSlide = newIndex;
-        saveState();
+    const newIndex = currentSlideIndex + direction;
+    if (newIndex >= 0 && newIndex < slides.length) {
+        setCurrentSlideIndex(newIndex);
         renderSlide();
     }
 }
 
 function renderSlide() {
-    const data = content[state.currentLang][state.currentSlide];
+    const activeCourse = courses[state.currentCourseId];
+    if (!activeCourse) return;
+
+    const currentSlideIndex = getCurrentSlideIndex();
+    const slides = activeCourse.content[state.currentLang];
+    const data = slides[currentSlideIndex];
+
     const contentDiv = document.getElementById('contentArea');
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
     const progress = document.getElementById('progressBar');
     const pageInd = document.getElementById('pageIndicator');
+    const pdfBtn = document.getElementById('btn-pdf');
+
+    // Show UI elements
+    document.querySelector('.progress-container').style.display = 'block';
+    document.querySelector('.nav-footer').style.display = 'flex';
+    if (pdfBtn) pdfBtn.style.display = 'inline-block';
 
     // Update Progress
-    const percent = ((state.currentSlide) / (content[state.currentLang].length - 1)) * 100;
+    const percent = ((currentSlideIndex) / (slides.length - 1)) * 100;
     progress.style.width = percent + "%";
     document.querySelector('.progress-container').setAttribute('aria-valuenow', Math.round(percent));
-    pageInd.innerText = `${state.currentSlide + 1} / ${content[state.currentLang].length}`;
+    pageInd.innerText = `${currentSlideIndex + 1} / ${slides.length}`;
 
     // Render Content
     if (data.type === 'quiz') {
@@ -93,14 +200,14 @@ function renderSlide() {
         pageInd.style.display = 'none';
     } else {
         let contentHtml = data.html;
-        // Render sprite image for slides 0-5
-        if (state.currentSlide <= 5) {
-            contentHtml = `<div class="slide-sprite slide-sprite-${state.currentSlide}"></div>` + contentHtml;
+        // Render sprite image for slides 0-5 ONLY for FSE course
+        if (state.currentCourseId === 'fse' && currentSlideIndex <= 5) {
+            contentHtml = `<div class="slide-sprite slide-sprite-${currentSlideIndex}"></div>` + contentHtml;
         }
         contentDiv.innerHTML = contentHtml;
 
         // Restore name if back on slide 0
-        if (state.currentSlide === 0 && state.userName) {
+        if (currentSlideIndex === 0 && state.userName) {
             const input = document.getElementById('inputName');
             if (input) input.value = state.userName;
         }
@@ -111,7 +218,7 @@ function renderSlide() {
     }
 
     // Disable Prev on start
-    prevBtn.disabled = state.currentSlide === 0;
+    prevBtn.disabled = currentSlideIndex === 0;
 }
 
 function renderQuiz(data) {
@@ -130,8 +237,7 @@ function renderQuiz(data) {
     document.getElementById('contentArea').innerHTML = html;
 }
 
-function validateQuiz() {
-    const data = content[state.currentLang][state.currentSlide];
+function validateQuiz(data) {
     let score = 0;
     let answeredAll = true;
 
@@ -165,12 +271,14 @@ function validateQuiz() {
 }
 
 function renderCertificate() {
+    const activeCourse = courses[state.currentCourseId];
     const date = new Date().toLocaleDateString(state.currentLang === 'no' ? 'no-NO' : 'en-GB');
 
     // Update document title for print filename
     const safeDate = new Date().toISOString().split('T')[0];
     const safeFileName = state.userName.replace(/[^a-z0-9]/gi, '_');
-    document.title = `FSE_Certificate_${safeFileName}_${safeDate}`;
+    const courseTitle = typeof activeCourse.title === 'object' ? activeCourse.title.en : activeCourse.title; // Use EN for filename
+    document.title = `${courseTitle.replace(/\s+/g, '_')}_Certificate_${safeFileName}_${safeDate}`;
 
     // Safe way to handle user name to prevent XSS
     const safeName = document.createElement('div');
@@ -183,13 +291,12 @@ function renderCertificate() {
         <div class="cert-title">CERTIFICATE</div>
         <p>${state.currentLang === 'no' ? 'Det bekreftes herved at' : 'This certifies that'}</p>
         <div class="cert-name">${safeNameStr}</div>
-        <p>${state.currentLang === 'no' ? 'har fullført og bestått teoretisk' : 'has completed and passed theoretical'}</p>
-        <h2>FSE Low Voltage & Safety Course</h2>
+        <p>${state.currentLang === 'no' ? 'har fullført og bestått' : 'has completed and passed'}</p>
+        <h2>${typeof activeCourse.title === 'object' ? activeCourse.title[state.currentLang] : activeCourse.title}</h2>
         <div class="cert-details">
-            <p><strong>Modules Covered:</strong> Roles, Risk Assessment (SJA), Arc Flash/Shock Physics,<br>Work Methods (FSE §14-16) & Acute First Aid Theory.</p>
-            <p><strong>Scope:</strong> Seid AS International Operations & SMPS/DC-Link Safety.</p>
+            <p><strong>Scope:</strong> Seid AS International Operations.</p>
             <p><em>Date: ${date} - Valid for 12 months</em></p>
-            <p style="font-size: 0.7rem; color: #999; margin-top: 5px;">Rev. ${meta.revision}</p>
+            <p style="font-size: 0.7rem; color: #999; margin-top: 5px;">Rev. ${activeCourse.revision}</p>
         </div>
         <div class="no-print" style="margin-top: 50px; border-top: 1px solid #eee; padding-top: 20px;">
             <p style="color: #d9534f; font-weight: bold; font-size: 0.9rem;">
@@ -200,8 +307,8 @@ function renderCertificate() {
             <button onclick="window.print()" class="btn btn-primary">
                 ${state.currentLang === 'no' ? 'Last ned PDF / Skriv ut' : 'Download PDF / Print'}
             </button>
-            <button onclick="window.resetCourse()" class="btn btn-secondary" style="margin-left: 10px;">
-                 ${state.currentLang === 'no' ? 'Start på nytt' : 'Restart'}
+            <button onclick="window.goToDashboard()" class="btn btn-secondary" style="margin-left: 10px;">
+                 ${state.currentLang === 'no' ? 'Tilbake til meny' : 'Back to Menu'}
             </button>
         </div>
     </div>
@@ -278,15 +385,19 @@ function showPasswordModal(onSuccess) {
 }
 
 function generateFullCourseView(showAnswers) {
-    const allSlides = content[state.currentLang];
+    if (!state.currentCourseId) return;
+    const activeCourse = courses[state.currentCourseId];
+    const allSlides = activeCourse.content[state.currentLang];
+
     let html = `<div class="full-course-view">`;
 
     // Add Header for Print
     html += `
         <div class="print-header" style="text-align: center; margin-bottom: 40px; border-bottom: 2px solid #333; padding-bottom: 20px;">
-            <h1>Seid AS - FSE & Safety Training</h1>
+            <h1>Seid AS - Academy</h1>
+            <h2>${typeof activeCourse.title === 'object' ? activeCourse.title[state.currentLang] : activeCourse.title}</h2>
             <p>Full Course Content - ${new Date().toLocaleDateString()}</p>
-            <p style="font-size: 0.8rem; color: #666;">Rev. ${meta.revision}</p>
+            <p style="font-size: 0.8rem; color: #666;">Rev. ${activeCourse.revision}</p>
         </div>
     `;
 
@@ -314,8 +425,8 @@ function generateFullCourseView(showAnswers) {
             // Add slide number
             html += `<div style="font-size: 0.8rem; color: #666; margin-bottom: 10px;">Slide ${index + 1}</div>`;
 
-            // Add Image if applicable (Slides 0-5)
-            if (index <= 5) {
+            // Add Image if applicable (Slides 0-5) AND FSE course
+            if (state.currentCourseId === 'fse' && index <= 5) {
                 html += `<div class="slide-sprite slide-sprite-${index}" style="width: 50%; margin: 0 auto 20px auto;"></div>`;
             }
             html += slide.html;
@@ -329,6 +440,7 @@ function generateFullCourseView(showAnswers) {
     // Hide UI elements
     document.querySelector('.progress-container').style.display = 'none';
     document.querySelector('.nav-footer').style.display = 'none';
+    document.getElementById('btn-menu').style.display = 'none';
 
     const contentArea = document.getElementById('contentArea');
     contentArea.innerHTML = html;
@@ -343,4 +455,15 @@ function generateFullCourseView(showAnswers) {
     printBtn.style.margin = '0 auto 20px auto';
 
     contentArea.insertBefore(printBtn, contentArea.firstChild);
+
+    // Add Back button in print view
+    const backBtn = document.createElement('button');
+    backBtn.className = 'btn btn-secondary no-print';
+    backBtn.innerText = state.currentLang === 'no' ? 'Tilbake' : 'Back';
+    backBtn.onclick = () => window.location.reload();
+    backBtn.style.marginBottom = '20px';
+    backBtn.style.display = 'block';
+    backBtn.style.margin = '0 auto 20px auto';
+
+    contentArea.insertBefore(backBtn, contentArea.firstChild);
 }
