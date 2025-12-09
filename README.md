@@ -46,6 +46,23 @@ Because this project uses **ES Modules**, it requires a local web server to run 
 1.  Open the project in VS Code.
 2.  Right-click `index.html` and select "Open with Live Server".
 
+### Guides
+
+#### Student Guide
+1.  **Start:** Enter your full name on the welcome screen. This name will appear on your certificate.
+2.  **Navigate:** Use "Neste" (Next) to move through slides. Read all safety information carefully.
+3.  **Quiz:** At the end, you must pass a multiple-choice exam (80% score required).
+4.  **Certificate:** Upon passing, your certificate is generated.
+    *   Click "Last ned PDF" (Download PDF) to save/print it.
+    *   **Important:** Send this PDF to your HR/Safety manager for archiving.
+5.  **Full Course (Reference):** You can download a PDF of the entire course content (without quiz answers) for your reference using the "Last ned PDF" button in the top bar.
+    *   **Password:** `FSE2025`
+
+#### Admin / Instructor Guide
+*   **Full Course (Master Copy):** Instructors can download the course content *with correct answers highlighted* for training purposes.
+    *   Click "Last ned PDF" in the top bar.
+    *   **Password:** `Seid2025`
+
 ## Project Structure
 
 ```

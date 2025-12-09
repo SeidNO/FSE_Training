@@ -211,12 +211,73 @@ function renderCertificate() {
 }
 
 export function renderFullCourse() {
-    const password = prompt(state.currentLang === 'no' ? "Skriv inn passord for å laste ned:" : "Enter password to download:");
-    if (password !== "Seid2025") {
-        alert(state.currentLang === 'no' ? "Feil passord." : "Incorrect password.");
-        return;
-    }
+    showPasswordModal((password) => {
+        if (password === "Seid2025") {
+            // Admin/Teacher: Show answers
+            generateFullCourseView(true);
+        } else if (password === "FSE2025") {
+            // Student: Hide answers
+            generateFullCourseView(false);
+        } else {
+            alert(state.currentLang === 'no' ? "Feil passord." : "Incorrect password.");
+        }
+    });
+}
 
+function showPasswordModal(onSuccess) {
+    // Create modal elements
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+
+    const content = document.createElement('div');
+    content.className = 'modal-content';
+
+    const title = document.createElement('h3');
+    title.className = 'modal-title';
+    title.innerText = state.currentLang === 'no' ? "Passordbeskyttet" : "Password Protected";
+
+    const input = document.createElement('input');
+    input.type = 'password';
+    input.className = 'modal-input';
+    input.placeholder = state.currentLang === 'no' ? "Skriv inn passord" : "Enter password";
+
+    const btnContainer = document.createElement('div');
+    btnContainer.className = 'modal-buttons';
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'btn btn-secondary';
+    cancelBtn.innerText = state.currentLang === 'no' ? "Avbryt" : "Cancel";
+    cancelBtn.onclick = () => document.body.removeChild(overlay);
+
+    const okBtn = document.createElement('button');
+    okBtn.className = 'btn btn-primary';
+    okBtn.innerText = "OK";
+
+    // Submit handler
+    const submit = () => {
+        const val = input.value;
+        document.body.removeChild(overlay);
+        onSuccess(val);
+    };
+
+    okBtn.onclick = submit;
+    input.onkeydown = (e) => {
+        if (e.key === 'Enter') submit();
+    };
+
+    // Assemble
+    btnContainer.appendChild(cancelBtn);
+    btnContainer.appendChild(okBtn);
+    content.appendChild(title);
+    content.appendChild(input);
+    content.appendChild(btnContainer);
+    overlay.appendChild(content);
+
+    document.body.appendChild(overlay);
+    input.focus();
+}
+
+function generateFullCourseView(showAnswers) {
     const allSlides = content[state.currentLang];
     let html = `<div class="full-course-view">`;
 
@@ -225,6 +286,7 @@ export function renderFullCourse() {
         <div class="print-header" style="text-align: center; margin-bottom: 40px; border-bottom: 2px solid #333; padding-bottom: 20px;">
             <h1>Seid AS - FSE & Safety Training</h1>
             <p>Full Course Content - ${new Date().toLocaleDateString()}</p>
+            <p style="font-size: 0.8rem; color: #666;">Rev. ${meta.revision}</p>
         </div>
     `;
 
@@ -239,7 +301,12 @@ export function renderFullCourse() {
                 html += `<div class="quiz-item" style="margin-bottom: 20px;">
                     <p><strong>${qIdx + 1}. ${q.q}</strong></p>
                     <ul>
-                        ${q.options.map((opt, oIdx) => `<li style="${oIdx === q.ans ? 'font-weight:bold; color:green;' : ''}">${opt} ${oIdx === q.ans ? '(Correct)' : ''}</li>`).join('')}
+                        ${q.options.map((opt, oIdx) => {
+                    const isCorrect = oIdx === q.ans;
+                    const style = (showAnswers && isCorrect) ? 'font-weight:bold; color:green;' : '';
+                    const suffix = (showAnswers && isCorrect) ? ' (Correct)' : '';
+                    return `<li style="${style}">${opt}${suffix}</li>`;
+                }).join('')}
                     </ul>
                  </div>`;
             });
