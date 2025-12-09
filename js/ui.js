@@ -524,6 +524,12 @@ export function showImportModal() {
     title.innerText = "Import Course Data";
     title.style.color = '#333';
 
+    const helpText = document.createElement('p');
+    helpText.innerText = "Paste a valid JavaScript object or JSON here. Supports both key-value pairs (e.g. \"my_course\": { ... }) and direct object input ({ id: \"...\", content: ... }). See README.md for schema details.";
+    helpText.style.fontSize = '0.9rem';
+    helpText.style.color = '#555';
+    helpText.style.marginBottom = '15px';
+
     const textarea = document.createElement('textarea');
     textarea.placeholder = "Paste JS/JSON object here (e.g. { id: '...', ... })";
     textarea.style.width = '100%';
@@ -559,6 +565,7 @@ export function showImportModal() {
     btnContainer.appendChild(cancelBtn);
     btnContainer.appendChild(importBtn);
     content.appendChild(title);
+    content.appendChild(helpText);
     content.appendChild(textarea);
     content.appendChild(btnContainer);
     overlay.appendChild(content);
