@@ -11,7 +11,18 @@ A web-based interactive training module designed for Seid AS employees. This app
     *   Generates a personalized certificate upon passing the quiz.
     *   **Print-Optimized**: Formatted perfectly for A4 paper (CSS `@media print`).
     *   **Custom Filename**: Automatically suggests `FSE_Certificate_[Name]_[Date]` when saving as PDF.
-*   **State Persistence**: Automatically saves progress (current slide, language, name) to `localStorage`, allowing users to resume where they left off.
+*   **Recertification Logic**:
+    *   **Expiration Check**: Automatically flags certificates older than 12 months as "Expired".
+    *   **Course Reset**: Resets progress for expired courses, requiring the user to retake them to ensure compliance.
+*   **State Persistence**: Automatically saves progress (current slide, language, name, completion dates) to `localStorage`, allowing users to resume where they left off.
+
+> [!IMPORTANT]
+> **Privacy & Data Storage Warning**:
+> This application runs entirely in your browser ("client-side").
+> *   All progress and certificates are saved **LOCALLY** on the specific computer and browser you are using.
+> *   Nothing is sent to a central server.
+> *   **Consequence:** If you wipe your browser cache, switch computers, or use "Incognito/Private" mode, your progress and certificates will be **LOST**.
+> *   **Action:** Always download and save your PDF certificate immediately upon completion.
 *   **Responsive Design**: Works on desktop and tablets.
 
 ## Tech Stack
@@ -51,6 +62,15 @@ Because this project uses **ES Modules**, it requires a local web server to run 
 ### Guides
 
 #### Student Guide
+
+> [!CAUTION]
+> **CRITICAL: Your Progress is Saved LOCALLY**
+> This training app does **NOT** save your progress to a central server. Everything is stored in your specific browser on this specific computer.
+> *   **Do not switch computers** mid-course.
+> *   **Do not use "Incognito" or "Private" windows**, as progress is lost when you close them.
+> *   **Do not clear your browser history/cache** while taking the course.
+> *   **ALWAYS download your PDF certificate immediately** after finishing. If you lose the PDF, you may have to retake the entire course.
+
 1.  **Start:** Enter your full name on the welcome screen. This name will appear on your certificate.
 2.  **Navigate:** Use "Neste" (Next) to move through slides. Read all safety information carefully.
 3.  **Quiz:** At the end, you must pass a multiple-choice exam (80% score required).
@@ -214,4 +234,7 @@ FSE_Training/
     *   Added dynamic document titling for easier PDF saving.
 *   **Multi-Course Support**: Refactored architecture to support multiple independent courses (e.g., FSE, First Aid).
 *   **Course Dashboard**: New landing page to select available training modules.
+*   **Certificate Expiration**: Implemented 12-month validity check.
+    *   Courses older than 1 year are marked "Expired" on the dashboard.
+    *   Progress is reset to enforce annual retraining (FSE requirement).
 *   **Content**: Updated safety instructions to specifically address ModuPower and ESP/Reactor hazards.

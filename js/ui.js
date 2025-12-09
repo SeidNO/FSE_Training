@@ -1,5 +1,5 @@
 import { courses } from '../data/content.js';
-import { state, saveState, resetState, getCurrentSlideIndex, setCurrentSlideIndex } from './state.js';
+import { state, saveState, resetState, getCurrentSlideIndex, setCurrentSlideIndex, checkRevisions, checkExpirations, completeCourseRevision } from './state.js';
 
 export function init() {
     // Bind global functions
@@ -10,11 +10,18 @@ export function init() {
     window.renderFullCourse = renderFullCourse;
     window.loadCourse = loadCourse;
     window.goToDashboard = goToDashboard;
-    window.showImportModal = showImportModal;
+    window.openAdminPanel = openAdminPanel;
     window.importCourse = importCourse;
 
     // Load imported courses from persistence
     loadImportedCourses();
+
+    // Check for revisions and reset progress if needed
+    checkRevisions(courses);
+
+    // Check for expirations (12 months) and reset progress
+    // We don't alert anymore, we show it in the dashboard
+    checkExpirations(courses);
 
     // Set initial language UI
     updateLangUI();
@@ -108,6 +115,23 @@ function renderDashboard() {
         const total = course.content[lang].length;
         const isComplete = current >= total - 1;
 
+        // Check for new revision
+        // If we have a stored revision, and it's different from current, AND we aren't currently effectively complete (which would be handled by resetState logic anyway, but UI needs to know)
+        // Actually, checkRevisions runs on init. So if there was a mismatch, progress is already 0.
+        // We just need to know if we *previously* completed an older revision.
+        const storedRev = state.completedRevisions[course.id];
+        const isNewRevision = storedRev && storedRev !== course.revision;
+
+        // Check for Expiration
+        let isExpired = false;
+        const oneYearMs = 365 * 24 * 60 * 60 * 1000;
+        if (state.completionDates && state.completionDates[course.id]) {
+            const date = new Date(state.completionDates[course.id]);
+            if ((new Date() - date) > oneYearMs) {
+                isExpired = true;
+            }
+        }
+
         html += `
             <div class="course-card" onclick="loadCourse('${course.id}')" style="
                 background: white; 
@@ -117,13 +141,21 @@ function renderDashboard() {
                 cursor: pointer; 
                 transition: transform 0.2s; 
                 text-align: left; 
-                border-left: 5px solid ${isComplete ? '#4CAF50' : '#0056b3'};
+                border-left: 5px solid ${isComplete ? '#4CAF50' : (isExpired ? '#d9534f' : (isNewRevision ? '#FFC107' : '#0056b3'))};
+                position: relative;
             " onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
-                <h3 style="margin-top: 0; color: #333;">${title}</h3>
-                <p style="color: #666; font-size: 0.9rem;">Revision: ${course.revision}</p>
+                <div style="position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 5px; align-items: flex-end;">
+                    ${isNewRevision ? `<span style="background: #FFC107; color: #000; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;">New Revision</span>` : ''}
+                    ${isExpired ? `<span style="background: #d9534f; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;">${lang === 'no' ? 'Utløpt' : 'Expired'}</span>` : ''}
+                </div>
+                <h3 style="margin-top: 0; color: #333; padding-right: 70px;">${title}</h3>
+                <p style="color: #666; font-size: 0.9rem;">
+                    Revision: ${course.revision}
+                    ${storedRev && storedRev !== course.revision ? `<br><span style="font-size: 0.8rem; color: #eebb00;">(Prev: ${storedRev})</span>` : ''}
+                </p>
                 <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-weight: bold; color: ${isComplete ? 'green' : '#0056b3'}">
-                        ${isComplete ? (lang === 'no' ? 'Fullført' : 'Completed') : (lang === 'no' ? 'Start' : 'Start')}
+                    <span style="font-weight: bold; color: ${isComplete ? 'green' : (isExpired ? '#d9534f' : (isNewRevision ? '#e6a800' : '#0056b3'))}">
+                        ${isComplete ? (lang === 'no' ? 'Fullført' : 'Completed') : (isExpired ? (lang === 'no' ? 'Forny nå' : 'Renew now') : (isNewRevision ? (lang === 'no' ? 'Oppdatering' : 'Update') : (lang === 'no' ? 'Start' : 'Start')))}
                     </span>
                     <span style="font-size: 0.8rem; background: #eee; padding: 2px 8px; border-radius: 10px;">
                         ${modules} Moduler
@@ -308,6 +340,9 @@ function validateQuiz(data) {
 
 function renderCertificate() {
     const activeCourse = courses[state.currentCourseId];
+    // Mark as completed revision
+    completeCourseRevision(state.currentCourseId, activeCourse.revision);
+
     const date = new Date().toLocaleDateString(state.currentLang === 'no' ? 'no-NO' : 'en-GB');
 
     // Update document title for print filename
@@ -512,28 +547,95 @@ function generateFullCourseView(showAnswers) {
     backBtn.style.display = 'block';
 }
 
-export function showImportModal() {
+export function openAdminPanel() {
+    showPasswordModal((password) => {
+        // Simple password check - ideally should be robust or server-side, but client-side app limitation
+        if (password === "Seid2025") {
+            showAdminModal();
+        } else {
+            alert(state.currentLang === 'no' ? "Feil passord." : "Incorrect password.");
+        }
+    });
+}
+
+function showAdminModal() {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
 
     const content = document.createElement('div');
     content.className = 'modal-content';
-    content.style.maxWidth = '600px';
+    content.style.maxWidth = '700px';
+
+    const header = document.createElement('div');
+    header.style.display = 'flex';
+    header.style.justifyContent = 'space-between';
+    header.style.alignItems = 'center';
+    header.style.marginBottom = '15px';
 
     const title = document.createElement('h3');
-    title.innerText = "Import Course Data";
+    title.innerText = "Admin Interface";
+    title.style.margin = '0';
     title.style.color = '#333';
 
+    const closeBtn = document.createElement('span');
+    closeBtn.innerHTML = '&times;';
+    closeBtn.style.fontSize = '1.5rem';
+    closeBtn.style.cursor = 'pointer';
+    closeBtn.onclick = () => document.body.removeChild(overlay);
+
+    header.appendChild(title);
+    header.appendChild(closeBtn);
+
+    // Controls Container
+    const controls = document.createElement('div');
+    controls.style.marginBottom = '15px';
+    controls.style.display = 'flex';
+    controls.style.gap = '10px';
+    controls.style.alignItems = 'center';
+
+    const label = document.createElement('label');
+    label.innerText = "Select Course to Edit/Export:";
+
+    const select = document.createElement('select');
+    select.style.padding = '5px';
+    select.style.flexGrow = '1';
+
+    // Default option
+    const defOpt = document.createElement('option');
+    defOpt.value = "";
+    defOpt.innerText = "-- New / Paste JSON --";
+    select.appendChild(defOpt);
+
+    // Populate with existing courses
+    Object.values(courses).forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        const t = typeof c.title === 'object' ? c.title.en : c.title;
+        opt.innerText = `${t} (${c.id})`;
+        select.appendChild(opt);
+    });
+
+    controls.appendChild(label);
+    controls.appendChild(select);
+
+    const statusMsg = document.createElement('span');
+    statusMsg.innerText = " Valid JSON";
+    statusMsg.style.color = 'green';
+    statusMsg.style.fontSize = '0.8rem';
+    statusMsg.style.marginLeft = '10px';
+    statusMsg.style.display = 'none'; // hidden by default until typing/loading
+    controls.appendChild(statusMsg);
+
     const helpText = document.createElement('p');
-    helpText.innerText = "Paste a valid JavaScript object or JSON here. Supports both key-value pairs (e.g. \"my_course\": { ... }) and direct object input ({ id: \"...\", content: ... }). See README.md for schema details.";
-    helpText.style.fontSize = '0.9rem';
-    helpText.style.color = '#555';
-    helpText.style.marginBottom = '15px';
+    helpText.innerText = "Edit course JSON below. 'Save' updates the course (reloads app). 'Copy' puts JSON in clipboard.";
+    helpText.style.fontSize = '0.85rem';
+    helpText.style.color = '#666';
+    helpText.style.marginBottom = '10px';
 
     const textarea = document.createElement('textarea');
-    textarea.placeholder = "Paste JS/JSON object here (e.g. { id: '...', ... })";
+    textarea.placeholder = "Paste JS/JSON object here...";
     textarea.style.width = '100%';
-    textarea.style.height = '300px';
+    textarea.style.height = '400px';
     textarea.style.fontFamily = 'monospace';
     textarea.style.fontSize = '0.9rem';
     textarea.style.marginBottom = '20px';
@@ -541,17 +643,114 @@ export function showImportModal() {
     textarea.style.border = '1px solid #ccc';
     textarea.style.borderRadius = '4px';
 
+    // JSON Validation Logic
+    const validateJSON = (showSuccess = true) => {
+        const val = textarea.value.trim();
+        if (!val) {
+            textarea.style.borderColor = '#ccc';
+            statusMsg.style.display = 'none';
+            return;
+        }
+        try {
+            // Try lenient parsing first (new Function) to match import logic
+            const wrapper = new Function("return " + val);
+            wrapper();
+            // If success
+            textarea.style.borderColor = 'green';
+            if (showSuccess) {
+                statusMsg.innerText = "✓ Valid JS Object";
+                statusMsg.style.color = 'green';
+                statusMsg.style.display = 'inline';
+            }
+        } catch (e) {
+            textarea.style.borderColor = 'red';
+            statusMsg.innerText = "⚠ Invalid Syntax";
+            statusMsg.style.color = 'red';
+            statusMsg.style.display = 'inline';
+        }
+    };
+
+    textarea.addEventListener('input', () => validateJSON(true));
+
+    // Auto-fill logic
+    select.onchange = () => {
+        if (select.value && courses[select.value]) {
+            const c = courses[select.value];
+            textarea.value = JSON.stringify(c, null, 4);
+            validateJSON(false); // Validate but maybe don't shout success immediately
+        } else {
+            textarea.value = "";
+            validateJSON(true);
+        }
+    };
+
     const btnContainer = document.createElement('div');
     btnContainer.className = 'modal-buttons';
 
-    const cancelBtn = document.createElement('button');
-    cancelBtn.className = 'btn btn-secondary';
-    cancelBtn.innerText = "Cancel";
-    cancelBtn.onclick = () => document.body.removeChild(overlay);
+    const formatBtn = document.createElement('button');
+    formatBtn.className = 'btn btn-secondary';
+    formatBtn.innerText = "Format";
+    formatBtn.onclick = () => {
+        if (!textarea.value) return;
+        try {
+            // We need to parse strictly to stringify strictly, but input might be loose JS
+            // So we use our loose parser, then stringify
+            const wrapper = new Function("return " + textarea.value);
+            const obj = wrapper();
+            textarea.value = JSON.stringify(obj, null, 4);
+            validateJSON(true);
+        } catch (e) {
+            alert("Cannot format invalid JSON/JS.");
+        }
+    };
 
-    const importBtn = document.createElement('button');
-    importBtn.className = 'btn btn-primary';
-    importBtn.innerText = "Import & Run";
+    const dlBtn = document.createElement('button');
+    dlBtn.className = 'btn btn-secondary';
+    dlBtn.innerText = "Download JSON";
+    dlBtn.onclick = () => {
+        if (!textarea.value) return;
+        try {
+            const wrapper = new Function("return " + textarea.value);
+            const obj = wrapper();
+            const jsonStr = JSON.stringify(obj, null, 4);
+            const blob = new Blob([jsonStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+
+            // Generate Sane Filename
+            let safeTitle = "course_export";
+            if (obj.title) {
+                const t = typeof obj.title === 'object' ? (obj.title.en || Object.values(obj.title)[0]) : obj.title;
+                safeTitle = t.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            }
+            const date = new Date().toISOString().split('T')[0];
+            a.download = `${safeTitle}_${date}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } catch (e) {
+            alert("Cannot download invalid JSON.");
+        }
+    };
+
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'btn btn-secondary';
+    copyBtn.innerText = "Copy JSON";
+    copyBtn.onclick = () => {
+        if (!textarea.value) return;
+        navigator.clipboard.writeText(textarea.value).then(() => {
+            const originalUserText = copyBtn.innerText;
+            copyBtn.innerText = "Copied!";
+            setTimeout(() => copyBtn.innerText = originalUserText, 2000);
+        });
+    };
+
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'btn btn-primary';
+    saveBtn.innerText = "Save / Import";
 
     const runImport = () => {
         const text = textarea.value;
@@ -560,17 +759,21 @@ export function showImportModal() {
         document.body.removeChild(overlay);
     };
 
-    importBtn.onclick = runImport;
+    saveBtn.onclick = runImport;
 
-    btnContainer.appendChild(cancelBtn);
-    btnContainer.appendChild(importBtn);
-    content.appendChild(title);
+    btnContainer.appendChild(formatBtn);
+    btnContainer.appendChild(copyBtn);
+    btnContainer.appendChild(dlBtn);
+    btnContainer.appendChild(saveBtn);
+
+    content.appendChild(header);
+    content.appendChild(controls);
     content.appendChild(helpText);
     content.appendChild(textarea);
     content.appendChild(btnContainer);
     overlay.appendChild(content);
     document.body.appendChild(overlay);
-    textarea.focus();
+    select.focus();
 }
 
 export function importCourse(input) {
@@ -636,9 +839,8 @@ function loadImportedCourses() {
     try {
         const imported = JSON.parse(localStorage.getItem('fse_imported_courses') || '{}');
         for (const [id, course] of Object.entries(imported)) {
-            if (!courses[id]) {
-                courses[id] = course;
-            }
+            // Always overwrite to allow updates to existing courses
+            courses[id] = course;
         }
     } catch (e) {
         console.error("Failed to load imported courses", e);
