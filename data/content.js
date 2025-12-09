@@ -858,5 +858,131 @@ export const courses = {
                 }
             ]
         }
+    },
+    "seid_rd_PSU": {
+        id: "seid_rd_PSU",
+        revision: "2025-12-09",
+        title: {
+            no: "Seid PSU",
+            en: "Seid PSU"
+        },
+        content: {
+            no: [
+                {
+                    title: "Introduksjon",
+                    html: `
+                <h1>Seid R&D Power & Control</h1>
+                <p>Velkommen til dette kurset som dekker utviklingen innen strømforsyning (PSU) hos Seid.</p>
+                <p>Vi ser på tidslinjen <strong>Fortid – Nåtid – Fremtid</strong> for våre teknologier.</p>
+                <div class="highlight-box">
+                    <strong>Fokus:</strong> Kurset tar for seg både kommersielle enheter, R&D-prosjekter og neste generasjons teknologi.
+                </div>
+            `
+                },
+                {
+                    title: "Teknologisk Oversikt",
+                    html: `
+                <h2>Produktkategorier</h2>
+                <p>Utviklingen av Seid High Voltage Power Supplies er delt inn i tre hovedfaser:</p>
+                <ul>
+                    <li><strong>Fortid:</strong> Commercial High Voltage Power Supplies</li>
+                    <li><strong>Nåtid:</strong> R&D High Voltage Power Supplies</li>
+                    <li><strong>Fremtid:</strong> Next Gen High Voltage Power Supplies</li>
+                </ul>
+                <p>Denne utviklingen sikrer kontinuerlig forbedring av ytelse og kontrollsystemer.</p>
+            `
+                },
+                {
+                    title: "Sikkerhet og Advarsler",
+                    html: `
+                <h2>Høyspenning (High Voltage)</h2>
+                <p>Arbeid med PSU-enheter innebærer risiko som må tas på alvor.</p>
+                <div class="warning-box">
+                    <strong>Advarsel:</strong> Kun autorisert personell skal utføre service på R&D og Next Gen-enheter.
+                </div>
+                <div class="danger-box">
+                    <strong>FARE:</strong> Enhetene opererer med høyspenning (High Voltage). Berøring av strømførende deler kan være livstruende. Sørg for at utstyret er spenningsløst før inspeksjon.
+                </div>
+            `
+                },
+                {
+                    title: "Kunnskapstest",
+                    type: "quiz",
+                    questions: [
+                        {
+                            q: "Hvilke tre kategorier beskriver utviklingen av Seid High Voltage Power Supplies?",
+                            options: [
+                                "Commercial, R&D, Next Gen",
+                                "Low Voltage, Mid Voltage, High Voltage",
+                                "Analog, Digital, Hybrid"
+                            ],
+                            ans: 0
+                        }
+                    ]
+                },
+                {
+                    title: "Fullført",
+                    type: "cert"
+                }
+            ],
+            en: [
+                {
+                    title: "Introduction",
+                    html: `
+                <h1>Seid R&D Power & Control</h1>
+                <p>Welcome to this course covering the development of Power Supply Units (PSU) at Seid.</p>
+                <p>We look at the timeline <strong>Past – Present – Future</strong> for our technologies.</p>
+                <div class="highlight-box">
+                    <strong>Focus:</strong> The course covers commercial units, R&D projects, and next-generation technology.
+                </div>
+            `
+                },
+                {
+                    title: "Technology Overview",
+                    html: `
+                <h2>Product Categories</h2>
+                <p>The development of Seid High Voltage Power Supplies is divided into three main phases:</p>
+                <ul>
+                    <li><strong>Past:</strong> Commercial High Voltage Power Supplies</li>
+                    <li><strong>Present:</strong> R&D High Voltage Power Supplies</li>
+                    <li><strong>Future:</strong> Next Gen High Voltage Power Supplies</li>
+                </ul>
+                <p>This evolution ensures continuous improvement of performance and control systems.</p>
+            `
+                },
+                {
+                    title: "Safety and Warnings",
+                    html: `
+                <h2>High Voltage</h2>
+                <p>Working with PSU units involves risks that must be taken seriously.</p>
+                <div class="warning-box">
+                    <strong>Warning:</strong> Only authorized personnel should service R&D and Next Gen units.
+                </div>
+                <div class="danger-box">
+                    <strong>DANGER:</strong> The units operate with High Voltage. Touching live parts can be fatal. Ensure the equipment is de-energized before inspection.
+                </div>
+            `
+                },
+                {
+                    title: "Knowledge Check",
+                    type: "quiz",
+                    questions: [
+                        {
+                            q: "Which three categories describe the evolution of Seid High Voltage Power Supplies?",
+                            options: [
+                                "Commercial, R&D, Next Gen",
+                                "Low Voltage, Mid Voltage, High Voltage",
+                                "Analog, Digital, Hybrid"
+                            ],
+                            ans: 0
+                        }
+                    ]
+                },
+                {
+                    title: "Completed",
+                    type: "cert"
+                }
+            ]
+        }
     }
 };

@@ -10,6 +10,11 @@ export function init() {
     window.renderFullCourse = renderFullCourse;
     window.loadCourse = loadCourse;
     window.goToDashboard = goToDashboard;
+    window.showImportModal = showImportModal;
+    window.importCourse = importCourse;
+
+    // Load imported courses from persistence
+    loadImportedCourses();
 
     // Set initial language UI
     updateLangUI();
@@ -505,7 +510,130 @@ function generateFullCourseView(showAnswers) {
     backBtn.onclick = () => window.location.reload();
     backBtn.style.marginBottom = '20px';
     backBtn.style.display = 'block';
-    backBtn.style.margin = '0 auto 20px auto';
+}
 
-    contentArea.insertBefore(backBtn, contentArea.firstChild);
+export function showImportModal() {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+
+    const content = document.createElement('div');
+    content.className = 'modal-content';
+    content.style.maxWidth = '600px';
+
+    const title = document.createElement('h3');
+    title.innerText = "Import Course Data";
+    title.style.color = '#333';
+
+    const textarea = document.createElement('textarea');
+    textarea.placeholder = "Paste JS/JSON object here (e.g. { id: '...', ... })";
+    textarea.style.width = '100%';
+    textarea.style.height = '300px';
+    textarea.style.fontFamily = 'monospace';
+    textarea.style.fontSize = '0.9rem';
+    textarea.style.marginBottom = '20px';
+    textarea.style.padding = '10px';
+    textarea.style.border = '1px solid #ccc';
+    textarea.style.borderRadius = '4px';
+
+    const btnContainer = document.createElement('div');
+    btnContainer.className = 'modal-buttons';
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'btn btn-secondary';
+    cancelBtn.innerText = "Cancel";
+    cancelBtn.onclick = () => document.body.removeChild(overlay);
+
+    const importBtn = document.createElement('button');
+    importBtn.className = 'btn btn-primary';
+    importBtn.innerText = "Import & Run";
+
+    const runImport = () => {
+        const text = textarea.value;
+        if (!text.trim()) return;
+        importCourse(text);
+        document.body.removeChild(overlay);
+    };
+
+    importBtn.onclick = runImport;
+
+    btnContainer.appendChild(cancelBtn);
+    btnContainer.appendChild(importBtn);
+    content.appendChild(title);
+    content.appendChild(textarea);
+    content.appendChild(btnContainer);
+    overlay.appendChild(content);
+    document.body.appendChild(overlay);
+    textarea.focus();
+}
+
+export function importCourse(input) {
+    try {
+        let newCourseObj = null;
+        // Try parsing assuming it's a key-value pair from the prompt: "id": { ... }
+        // We wrap it in braces to make it a valid object: { "id": { ... } }
+        try {
+            // Using new Function to allow loose JSON (JS object syntax)
+            const wrapper = new Function("return {" + input + "}");
+            const result = wrapper();
+            // Get the first key
+            const key = Object.keys(result)[0];
+            if (key && result[key].id && result[key].content) {
+                newCourseObj = result[key];
+            }
+        } catch (e) {
+            // Failed, try parsing as a direct object: { id: ..., content: ... }
+            try {
+                const direct = new Function("return " + input);
+                const result = direct();
+                if (result.id && result.content) {
+                    newCourseObj = result;
+                }
+            } catch (e2) {
+                console.error("Parse error", e2);
+            }
+        }
+
+        if (!newCourseObj) {
+            alert("Could not parse course data. Ensure it is a valid JS object with 'id', 'title' and 'content'.");
+            return;
+        }
+
+        // Add to courses
+        courses[newCourseObj.id] = newCourseObj;
+
+        // Save to persistence
+        saveImportedCourse(newCourseObj);
+
+        alert(`Course '${newCourseObj.id}' imported successfully!`);
+
+        // Go to dashboard to see it
+        goToDashboard();
+
+    } catch (err) {
+        alert("Error importing course: " + err.message);
+        console.error(err);
+    }
+}
+
+function saveImportedCourse(courseObj) {
+    try {
+        let imported = JSON.parse(localStorage.getItem('fse_imported_courses') || '{}');
+        imported[courseObj.id] = courseObj;
+        localStorage.setItem('fse_imported_courses', JSON.stringify(imported));
+    } catch (e) {
+        console.error("Failed to save imported course", e);
+    }
+}
+
+function loadImportedCourses() {
+    try {
+        const imported = JSON.parse(localStorage.getItem('fse_imported_courses') || '{}');
+        for (const [id, course] of Object.entries(imported)) {
+            if (!courses[id]) {
+                courses[id] = course;
+            }
+        }
+    } catch (e) {
+        console.error("Failed to load imported courses", e);
+    }
 }
