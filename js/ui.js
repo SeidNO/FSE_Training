@@ -12,6 +12,7 @@ export function init() {
     window.goToDashboard = goToDashboard;
     window.openAdminPanel = openAdminPanel;
     window.importCourse = importCourse;
+    window.setFilter = setFilter;
 
     // Load imported courses from persistence
     loadImportedCourses();
@@ -61,6 +62,12 @@ function updateLangUI() {
         menuBtn.innerHTML = state.currentLang === 'no' ? '&larr; Meny' : '&larr; Menu';
         menuBtn.onclick = goToDashboard;
     }
+
+    // Update PDF/Summary Button Text
+    const pdfBtn = document.getElementById('btn-pdf');
+    if (pdfBtn) {
+        pdfBtn.innerText = state.currentLang === 'no' ? 'Kurssammendrag' : 'Course Summary';
+    }
 }
 
 export function setLang(lang, render = true) {
@@ -103,10 +110,82 @@ function renderDashboard() {
     let html = `
         <div class="dashboard-container" style="max-width: 800px; margin: 0 auto; text-align: center;">
             <h1 style="margin-bottom: 40px;">Seid AS Academy</h1>
-            <div class="course-grid" style="display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
     `;
 
+    // 1. Extract Unique Tags
+    const allTags = new Map();
+    Object.values(courses).forEach(c => {
+        if (c.tags && Array.isArray(c.tags)) {
+            c.tags.forEach(t => {
+                // Support both old string tags (legacy safety) and new object tags
+                if (typeof t === 'object' && t.en && t.no) {
+                    allTags.set(t.en, t);
+                } else if (typeof t === 'string') {
+                    // Fallback if someone forgot to update a course
+                    allTags.set(t, { en: t, no: t });
+                }
+            });
+        }
+    });
+
+    // Sort tags by current language for display
+    const uniqueTags = Array.from(allTags.values()).sort((a, b) => {
+        return a[lang].localeCompare(b[lang]);
+    });
+
+    // 2. Render Filter Buttons
+    if (uniqueTags.length > 0) {
+        // Initialize filter state if not set
+        if (!state.currentFilter) state.currentFilter = 'all';
+
+        html += `<div class="filter-bar" style="margin-bottom: 30px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">`;
+
+        // 'All' Button
+        const allActive = state.currentFilter === 'all';
+        html += `<button onclick="setFilter('all')" class="btn-filter ${allActive ? 'active' : ''}" style="
+            padding: 8px 16px; 
+            border: 1px solid #ccc; 
+            border-radius: 20px; 
+            background: ${allActive ? '#0056b3' : '#fff'}; 
+            color: ${allActive ? '#fff' : '#333'}; 
+            cursor: pointer;
+            transition: all 0.2s;
+        ">${lang === 'no' ? 'Alle' : 'All'}</button>`;
+
+        // Tag Buttons
+        uniqueTags.forEach(tag => {
+            // We use the English value as the persistent ID for the filter
+            const isActive = state.currentFilter === tag.en;
+            html += `<button onclick="setFilter('${tag.en}')" class="btn-filter ${isActive ? 'active' : ''}" style="
+                padding: 8px 16px; 
+                border: 1px solid #ccc; 
+                border-radius: 20px; 
+                background: ${isActive ? '#0056b3' : '#fff'}; 
+                color: ${isActive ? '#fff' : '#333'}; 
+                cursor: pointer;
+                transition: all 0.2s;
+            ">${tag[lang]}</button>`;
+        });
+
+        html += `</div>`;
+    }
+
+    html += `<div class="course-grid" style="display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">`;
+
     Object.values(courses).forEach(course => {
+        // FILTER LOGIC
+        if (state.currentFilter !== 'all') {
+            if (!course.tags) return; // No tags = hide when filtering
+
+            // Check if any of the course's tags match the selected filter (by EN key)
+            const hasTag = course.tags.some(t => {
+                if (typeof t === 'object') return t.en === state.currentFilter;
+                return t === state.currentFilter; // Legacy string support
+            });
+
+            if (!hasTag) return;
+        }
+
         const title = typeof course.title === 'object' ? course.title[lang] : course.title;
         const modules = course.content[lang].filter(m => m.type !== 'cert').length;
 
@@ -149,6 +228,22 @@ function renderDashboard() {
                     ${isExpired ? `<span style="background: #d9534f; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;">${lang === 'no' ? 'Utløpt' : 'Expired'}</span>` : ''}
                 </div>
                 <h3 style="margin-top: 0; color: #333; padding-right: 70px;">${title}</h3>
+                
+                 <div style="margin-bottom: 10px;">
+                    ${course.tags ? course.tags.map(t => {
+            const label = (typeof t === 'object') ? t[lang] : t;
+            return `<span style="
+                        display: inline-block; 
+                        background: #eef; 
+                        color: #55a; 
+                        padding: 2px 8px; 
+                        border-radius: 10px; 
+                        font-size: 0.75rem; 
+                        margin-right: 5px;
+                    ">${label}</span>`;
+        }).join('') : ''}
+                </div>
+                
                 <p style="color: #666; font-size: 0.9rem;">
                     Revision: ${course.revision}
                     ${storedRev && storedRev !== course.revision ? `<br><span style="font-size: 0.8rem; color: #eebb00;">(Prev: ${storedRev})</span>` : ''}
@@ -167,6 +262,15 @@ function renderDashboard() {
 
     html += `</div></div>`;
     contentArea.innerHTML = html;
+}
+
+// Global function (attached to window in init usually, but good to export)
+export function setFilter(filter) {
+    state.currentFilter = filter;
+    // We don't save filter state to localStorage as it's a temporary UI state found often in session.
+    // If user wants persistence, add filter to state.js defaults. 
+    // For now, let's just re-render.
+    renderDashboard();
 }
 
 export function updateName(val) {
@@ -527,24 +631,40 @@ function generateFullCourseView(showAnswers) {
     const contentArea = document.getElementById('contentArea');
     contentArea.innerHTML = html;
 
-    // Add print button at the top
+    // Add buttons container at the top
+    const btnContainer = document.createElement('div');
+    btnContainer.className = 'no-print';
+    btnContainer.style.marginBottom = '20px';
+    btnContainer.style.display = 'flex';
+    btnContainer.style.justifyContent = 'center';
+    btnContainer.style.gap = '20px';
+
     const printBtn = document.createElement('button');
-    printBtn.className = 'btn btn-primary no-print';
-    printBtn.innerText = state.currentLang === 'no' ? 'Skriv ut til PDF' : 'Print to PDF';
+    printBtn.className = 'btn btn-primary';
+    printBtn.innerText = state.currentLang === 'no' ? 'Last ned PDF / Skriv ut' : 'Download PDF / Print';
     printBtn.onclick = () => window.print();
-    printBtn.style.marginBottom = '20px';
-    printBtn.style.display = 'block';
-    printBtn.style.margin = '0 auto 20px auto';
 
-    contentArea.insertBefore(printBtn, contentArea.firstChild);
-
-    // Add Back button in print view
+    // Back to Course (Resume)
     const backBtn = document.createElement('button');
-    backBtn.className = 'btn btn-secondary no-print';
-    backBtn.innerText = state.currentLang === 'no' ? 'Tilbake' : 'Back';
-    backBtn.onclick = () => window.location.reload();
-    backBtn.style.marginBottom = '20px';
-    backBtn.style.display = 'block';
+    backBtn.className = 'btn btn-secondary';
+    backBtn.innerText = state.currentLang === 'no' ? 'Tilbake til kurset' : 'Back to Course';
+    backBtn.onclick = () => {
+        // Just re-render the current slide
+        document.getElementById('btn-menu').style.display = 'inline-block';
+        renderSlide();
+    };
+
+    // Back to Dashboard
+    const menuBtn = document.createElement('button');
+    menuBtn.className = 'btn btn-secondary';
+    menuBtn.innerText = state.currentLang === 'no' ? 'Tilbake til meny' : 'Back to Menu';
+    menuBtn.onclick = () => window.goToDashboard();
+
+    btnContainer.appendChild(printBtn);
+    btnContainer.appendChild(backBtn);
+    btnContainer.appendChild(menuBtn);
+
+    contentArea.insertBefore(btnContainer, contentArea.firstChild);
 }
 
 export function openAdminPanel() {

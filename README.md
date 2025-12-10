@@ -114,6 +114,10 @@ You can use Gemini (or other LLMs) to rapidly generate course modules. Copy and 
 >         no: "Eksempelkurs",
 >         en: "Sample Course"
 >     },
+>     tags: [
+>         { no: "Sikkerhet", en: "Safety" }, 
+>         { no: "Kategori2", en: "Category2" }
+>     ],
 >     content: {
 >         no: [
 >             {
@@ -238,3 +242,10 @@ FSE_Training/
     *   Courses older than 1 year are marked "Expired" on the dashboard.
     *   Progress is reset to enforce annual retraining (FSE requirement).
 *   **Content**: Updated safety instructions to specifically address ModuPower and ESP/Reactor hazards.
+*   **Course Tagging & Filtering**: 
+    *   Added ability to group courses by tags (e.g., "Sikkerhet", "Førstehjelp").
+    *   Implemented a filter bar on the dashboard for easy course navigation.
+*   **Course Summary View**:
+    *   Renamed "Last ned PDF" to "Kurssammendrag" (Course Summary).
+    *   Added dedicated landing view for summarizing course content before printing.
+    *   Added navigation bar in summary view (Back to Course / Back to Menu).

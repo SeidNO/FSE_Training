@@ -6,6 +6,11 @@ export const courses = {
             no: "FSE & Sikkerhetskurs",
             en: "FSE & Safety Training"
         },
+        tags: [
+            { no: "Sikkerhet", en: "Safety" },
+            { no: "Obligatorisk", en: "Mandatory" },
+            { no: "FSE", en: "FSE" }
+        ],
         content: {
             no: [
                 {
@@ -378,6 +383,10 @@ export const courses = {
             no: "Grunnleggende førstehjelp og strømulykker",
             en: "Basic First Aid & Electrical Accidents"
         },
+        tags: [
+            { no: "Førstehjelp", en: "First Aid" },
+            { no: "Sikkerhet", en: "Safety" }
+        ],
         content: {
             no: [
                 {
@@ -636,6 +645,10 @@ export const courses = {
             no: "Refleks og Sikkerhet i Mørketiden (Utvidet)",
             en: "Reflectors and Safety in the Dark Season (Extended)"
         },
+        tags: [
+            { no: "HMS", en: "HSE" },
+            { no: "Sikkerhet", en: "Safety" }
+        ],
         content: {
             no: [
                 {
